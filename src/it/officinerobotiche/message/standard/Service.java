@@ -16,20 +16,27 @@ public class Service extends Jmessage {
 
     public enum Type {
 
-        RESET('*'),
-        DATE_CODE('d'),
-        NAME_BOARD('n'),
-        VERSION('v'),
-        AUTHOR('a');
+        RESET('*', "Reset"),
+        DATE_CODE('d', "Date code"),
+        NAME_BOARD('n', "Name board"),
+        VERSION('v', "Version code"),
+        AUTHOR('a', "Author");
 
         private final char name;
+        private final String name_s;
 
-        private Type(char name) {
+        private Type(char name, String name_s) {
             this.name = name;
+            this.name_s = name_s;
         }
 
         public char getName() {
             return name;
+        }
+        
+        @Override
+        public String toString() {
+            return name_s;
         }
     }
     
@@ -48,9 +55,18 @@ public class Service extends Jmessage {
     private final static int BUFF_SERVICE = 20;
     private byte[] data = new byte[BUFF_SERVICE + 1];
     
+    public Service(byte type, byte[] data) {
+        this.type = type;
+        this.data = data;
+    }
+    
     public Service(char name) {
         type = Jmessage.Type.REQUEST.getName();
         data[0] = (byte) name;
+    }
+    
+    public String getName() {
+        return null;
     }
     
     @Override

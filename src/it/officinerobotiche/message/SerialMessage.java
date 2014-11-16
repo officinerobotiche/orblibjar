@@ -8,6 +8,7 @@ package it.officinerobotiche.message;
 import it.officinerobotiche.serial.Packet;
 import it.officinerobotiche.serial.SerialPacket;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +19,8 @@ import java.util.logging.Logger;
 public class SerialMessage extends SerialPacket {
 
     // List all messages
-    //private final Set<Class<? extends Jmessage>> allClasses;
+    private Set<Class<? extends Jmessage>> allClasses;
+
     public SerialMessage(String portName) {
         super(portName);
     }
@@ -40,12 +42,33 @@ public class SerialMessage extends SerialPacket {
     }
 
     public <P extends Jmessage> P sendSyncMessage(P message) throws InterruptedException {
-        Packet packet = sendMessage(true, message);
-        return null;
+        return (P) parsePacket(sendMessage(true, message)).get(0);
     }
 
     public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) throws InterruptedException {
-        Packet packet = sendMessage(true, message);
+        return parsePacket(sendMessage(true, message));
+    }
+    
+    public <P extends Jmessage> ArrayList<P> parsePacket(Packet packet) {
+        ArrayList<P> list_receive = new ArrayList<P>();
+        byte[] data = packet.getDataStructure();
+        for(int i = 0; i < data.length; i += data[i]) {
+            try {
+                char type_message = (char) data[i+2];
+                int command = (int) data[i+3];
+                //Add data array
+                byte[] data_message = new byte[data[i]];
+                System.arraycopy(data, i+4, data, 0, data[i]);
+                for (Class<? extends Jmessage> message : allClasses) {
+                    //TODO Use type_message and command for find correct class;
+                    if(true) {
+                        list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class).newInstance(data[i+1], data_message));
+                    }
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return null;
     }
 

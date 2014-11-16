@@ -14,7 +14,7 @@ public abstract class Jmessage {
 
     protected final static byte LNG_HEADER = (byte) 4;
 
-    protected enum Type {
+    protected static enum Type {
 
         REQUEST('R'),
         DATA('D'),
@@ -27,7 +27,7 @@ public abstract class Jmessage {
             this.name = name;
         }
 
-        public byte getName() {
+        public final byte getName() {
             return (byte) name;
         }
     }
