@@ -5,12 +5,24 @@
  */
 package it.officinerobotiche.serial;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 /**
  * Packet for encode and decode packet received from uNAV 
  * @author Raffaello Bonghi
  */
 public class Packet {
-
+    /**
+     * Time to receive or create Packet
+     */
+    private final long timestamp;
+    /**
+     * Dateformat to time
+     */
+    protected DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
     /**
      * Type of packet, syncronous or asyncronous
      */
@@ -18,22 +30,43 @@ public class Packet {
     /**
      * Data bytes to decode
      */
-    private byte[] DataStructure;
+    private ArrayList<Byte> dataStructure;
     /**
-     * Temporaney dimension of packet
+     * Dimension of packet
      */
     private int length = 0;
     /**
      * Checksum packet
      */
     private byte checksumR = 0;
-
+    
     /**
      * Initialize packet with type of packet
-     * @param sync 
+     * @param sync type of packet: syncronus or asyncornus packet
+     * @param currentTimeMillis time to create packet
+     */
+    public Packet(boolean sync, long currentTimeMillis) {
+        this.sync = sync;
+        this.timestamp = currentTimeMillis;
+        dataStructure = new ArrayList<Byte>();
+    }
+    
+    /**
+     * Initialize packet with type of packet and set current time.
+     * @param sync type of packet: syncronus or asyncornus packet
      */
     public Packet(boolean sync) {
         this.sync = sync;
+        this.timestamp = System.currentTimeMillis();
+        dataStructure = new ArrayList<Byte>();
+    }
+    
+    /**
+     * Data creation packet
+     * @return time to creation packet 
+     */
+    public long getTimestamp() {
+        return timestamp;
     }
 
     /**
@@ -57,7 +90,7 @@ public class Packet {
      * @return Dimension of packet
      */
     public int getLengthPkg() {
-        return DataStructure.length;
+        return length;
     }
 
     /**
@@ -65,7 +98,7 @@ public class Packet {
      * @param lengthPkg length of packet
      */
     public void setLengthPkg(int lengthPkg) {
-        DataStructure = new byte[lengthPkg];
+        this.length = lengthPkg;
     }
 
     /**
@@ -74,14 +107,20 @@ public class Packet {
      * @return state of data packet saved, if true the message is totally copied
      */
     public boolean addByte(byte bytePkg) {
-        if (length < DataStructure.length) {
-            checksumR += bytePkg;                   //Sum all bytes for checksum
-            DataStructure[length++] = bytePkg;
-        } else if (length == DataStructure.length) {
+        if (dataStructure.size() < length) {
+            //Sum all bytes for checksum
+            checksumR += bytePkg;
+            dataStructure.add(bytePkg);
+        } else if (dataStructure.size() == length) {
             // verify packet and compare evaluate checksum with checksum received
             return (checksumR == bytePkg);
         }
         return false;
+    }
+    
+    public void addMessage(ArrayList<Byte> message) {
+        dataStructure.addAll(message);
+        length = dataStructure.size();
     }
 
     /**
@@ -89,16 +128,21 @@ public class Packet {
      * @return Data array structure
      */
     public byte[] getDataStructure() {
-        return DataStructure;
+        byte[] data = new byte[dataStructure.size()];
+        int i = 0;
+        for(Byte i_byte: dataStructure) {
+            data[i++] = i_byte;
+        }
+        return data;
     }
 
     @Override
     public String toString() {
         return "Packet{" + 
+                "Time Stamp=" + df.format(new Date(timestamp)) + ", " + 
                 "sync=" + sync + ", " + 
-                "DataStructure=" + DataStructure + ", " + 
-                "length=" + DataStructure.length + '}';
+                "DataStructure=" + dataStructure.toString() + ", " + 
+                "length=" + dataStructure.size() + '}';
     }
-    
     
 }

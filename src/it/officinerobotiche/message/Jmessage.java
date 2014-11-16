@@ -4,24 +4,41 @@
  */
 package it.officinerobotiche.message;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  *
- * @author Master
+ * @author Raffaello bonghi
  */
 public abstract class Jmessage {
 
-    protected DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+    protected final static byte LNG_HEADER = (byte) 4;
 
-    public abstract int getAck();
+    protected enum Type {
 
-    public abstract String getName();
+        REQUEST('R'),
+        DATA('D'),
+        ACK('K'),
+        NACK('N');
 
-    public abstract long getTimestamp();
+        private final char name;
 
-    public abstract boolean isCmdAT();
+        private Type(char name) {
+            this.name = name;
+        }
 
+        public byte getName() {
+            return (byte) name;
+        }
+    }
+    
+    public abstract byte getLength();
+    
+    public abstract byte getType();
+    
+    public abstract byte getType_message();
+    
+    public abstract byte getCommand();
+    
     public abstract byte[] getData();
 }

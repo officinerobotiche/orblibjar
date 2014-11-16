@@ -11,21 +11,21 @@ import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
-import gnu.io.UnsupportedCommOperationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashSet;
-import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.EventListenerList;
 
 /**
  *
  * @author Raffaello
  */
-public class SerialBridge implements SerialPortEventListener {
+public class SerialPacket implements SerialPortEventListener {
 
     /**
      * Serial port object to communicate with board
@@ -68,10 +68,12 @@ public class SerialBridge implements SerialPortEventListener {
      * Packet to decode
      */
     private Packet packet;
-    // List all messages
-    //private final Set<Class<? extends Jmessage>> allClasses;
 
-    public SerialBridge(String portName) {
+    private Barrier block = new Barrier();
+
+    protected EventListenerList listenerList = new EventListenerList();
+
+    public SerialPacket(String portName) {
         try {
             CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
             // open serial port, and use class name for the appName.
@@ -94,11 +96,6 @@ public class SerialBridge implements SerialPortEventListener {
         } catch (Exception e) {
             System.err.println(e.toString());
         }
-
-        //in = serialPort.getInputStream();
-        //out = serialPort.getOutputStream();
-        //Result<Jpacket> lookupResult = Lookup.getDefault().lookupResult(Jmessage.class);
-        //allClasses = lookupResult.allClasses();
     }
 
     /**
@@ -148,11 +145,15 @@ public class SerialBridge implements SerialPortEventListener {
                         //Reset Decoder
                         statusDec = 0;
                         //Decode Messages
-                        decodePkg(packet);
+                        if (packet.isSync()) {
+                            block.release();
+                        } else {
+                            firePacketEvent(new PacketEvent(packet));
+                        }
                     }
                 }
             } catch (Exception ex) {
-                Logger.getLogger(SerialBridge.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SerialPacket.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -209,25 +210,41 @@ public class SerialBridge implements SerialPortEventListener {
         return false;
     }
 
-    /**
-     *
-     * @param packet
-     */
-    private void decodePkg(Packet packet) {
-        //TODO create an event for a single Messages decode
-        //TODO Use reflection
+    public void addPacketEventListener(PacketListener listener) {
+        listenerList.add(PacketListener.class, listener);
+    }
+
+    public void removePacketEventListener(PacketListener listener) {
+        listenerList.remove(PacketListener.class, listener);
+    }
+
+    private void firePacketEvent(PacketEvent evt) {
+        Object[] listeners = listenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == PacketListener.class) {
+                ((PacketListener) listeners[i + 1]).asyncPacketEvent(evt);
+            }
+        }
     }
 
     /**
      * Send packet on serial port.
      *
      * @param packet Packet to send
+     * @return
      */
-    public void sendPacket(Packet packet) {
-        try {
-            out.write(convertPacket(packet));
-        } catch (IOException ex) {
-            Logger.getLogger(SerialBridge.class.getName()).log(Level.SEVERE, null, ex);
+    protected Packet sendPacket(Packet packet) throws InterruptedException {
+        if (packet.isSync()) {
+            try {
+                out.write(convertPacket(packet));
+                block.block();
+                return this.packet;
+            } catch (IOException ex) {
+                Logger.getLogger(SerialPacket.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
+            }
+        } else {
+            return null;
         }
     }
 
@@ -259,9 +276,9 @@ public class SerialBridge implements SerialPortEventListener {
      */
     private static byte checkSum(byte[] datapkg) {
         byte temp = 0;
-        for (int i = 0; i < datapkg.length; i++) {
+        for (Byte datapkg_i : datapkg) {
             // Sum all byte
-            temp += datapkg[i];
+            temp += datapkg_i;
         }
         return temp;
     }
