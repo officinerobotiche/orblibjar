@@ -6,7 +6,6 @@
 package it.officinerobotiche.message.standard;
 
 import it.officinerobotiche.message.Jmessage;
-import java.util.ArrayList;
 
 /**
  *
@@ -45,12 +44,12 @@ public class Service extends Jmessage {
      * type packet: * (D) Default messages (in top on this file) 
      * * other type messages (in UNAV file)
      */
-    private final static byte type_message = (byte) 'D';
+    public final static byte type_message = (byte) 'D';
     
     /**
      * command message
      */
-    private final static byte command = 0;
+    public final static byte command = 0;
     
     private final static int BUFF_SERVICE = 20;
     private byte[] data = new byte[BUFF_SERVICE + 1];

@@ -7,8 +7,15 @@ package it.officinerobotiche.message;
 
 import it.officinerobotiche.serial.Packet;
 import it.officinerobotiche.serial.SerialPacket;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,11 +25,18 @@ import java.util.logging.Logger;
  */
 public class SerialMessage extends SerialPacket {
 
+    private final static char DOT = '.';
+    private final static char SLASH = '/';
+    private final static String CLASS_SUFFIX = ".class";
+    private final static String FIELD_TYPE_MESSAGE = "type_message";
+    private final static String FIELD_COMMAND = "command";
     // List all messages
-    private Set<Class<? extends Jmessage>> allClasses;
+    private final List<Class<? extends Jmessage>> allClasses;
 
     public SerialMessage(String portName) {
         super(portName);
+        //Load all messages with extension Jmessage 
+        allClasses = SerialMessage.getJmessageClasses(SerialMessage.class.getPackage().getName());
     }
 
     public <P extends Jmessage> void sendASyncMessage(P message) {
@@ -48,28 +62,35 @@ public class SerialMessage extends SerialPacket {
     public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) throws InterruptedException {
         return parsePacket(sendMessage(true, message));
     }
-    
+
     public <P extends Jmessage> ArrayList<P> parsePacket(Packet packet) {
-        ArrayList<P> list_receive = new ArrayList<P>();
+        ArrayList<P> list_receive = new ArrayList<>();
         byte[] data = packet.getDataStructure();
-        for(int i = 0; i < data.length; i += data[i]) {
+        for (int i = 0; i < data.length; i += data[i]) {
             try {
-                char type_message = (char) data[i+2];
-                int command = (int) data[i+3];
-                //Add data array
-                byte[] data_message = new byte[data[i]];
-                System.arraycopy(data, i+4, data, 0, data[i]);
                 for (Class<? extends Jmessage> message : allClasses) {
-                    //TODO Use type_message and command for find correct class;
-                    if(true) {
-                        list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class).newInstance(data[i+1], data_message));
+                    //Find the correct Jmessage
+                    if (data[i + 2] == getFromField(message, FIELD_TYPE_MESSAGE)
+                            && data[i + 3] == getFromField(message, FIELD_COMMAND)) {
+                        //Add data array
+                        byte[] data_message = new byte[data[i]];
+                        System.arraycopy(data, i + 4, data, 0, data[i]);
+                        list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class).newInstance(data[i + 1], data_message));
                     }
                 }
             } catch (Exception ex) {
                 Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return null;
+        return list_receive;
+    }
+
+    private byte getFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field type_field = message.getField(name_field);
+        if (type_field.getType() == byte.class) {
+            return type_field.getByte(null);
+        }
+        return 0;
     }
 
     private <P extends Jmessage> Packet sendMessage(boolean sync, P message) throws InterruptedException {
@@ -96,5 +117,76 @@ public class SerialMessage extends SerialPacket {
             data.add(i);
         }
         return data;
+    }
+
+    /**
+     * Recursively fetches a list of all the classes in a given directory (and
+     * sub-directories) that have Jmessage extention.
+     *
+     * @param packageName The top level package to search.
+     * @return The list of all @UnitTestable classes.
+     */
+    public static final List<Class<? extends Jmessage>> getJmessageClasses(String packageName) {
+        // State what package we are exploring
+        System.out.println("Exploring package: " + packageName);
+        // Create the list that will hold the testable classes
+        List<Class<? extends Jmessage>> ret = new ArrayList<Class<? extends Jmessage>>();
+        // Load a class loader.
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        // Convert the package path to file path
+        String path = packageName.replace(DOT, SLASH);
+        // Try to get all of nested directories.
+        try {
+            // Get all of the resources for the given path
+            Enumeration<URL> res = loader.getResources(path);
+            // While we have directories to look at, recursively
+            // get all their classes.
+            while (res.hasMoreElements()) {
+                // Get the file path the the directory
+                String dirPath = URLDecoder.decode(res.nextElement().getPath(), "UTF-8");
+                // Make a file handler for easy managing
+                File dir = new File(dirPath);
+                // Check every file in the directory, if it's a
+                // directory, recursively add its viable files
+                for (File file : dir.listFiles()) {
+                    if (file.isDirectory()) {
+                        ret.addAll(getJmessageClasses(packageName + '.' + file.getName()));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // We failed to get any nested directories. State
+            // so and continue; this directory may still have
+            // some UnitTestable classes.
+            System.out.println("Failed to load resources for [" + packageName + ']');
+        }
+        // We need access to our directory, so we can pull
+        // all the classes.
+        URL tmp = loader.getResource(path);
+        System.out.println(tmp);
+        if (tmp == null) {
+            return ret;
+        }
+        File currDir = new File(tmp.getPath());
+        // Now we iterate through all of the classes we find
+        for (String classFile : currDir.list()) {
+            // Ensure that we only find class files; can't load gif's!
+            if (classFile.endsWith(CLASS_SUFFIX)) {
+                // Attempt to load the class or state the issue
+                try {
+                    // Try loading the class
+                    Class<?> add = Class.forName(packageName + DOT + classFile.substring(0, classFile.length() - 6));
+                    // Load all classes with
+                    Class<? extends Jmessage> asSubclass = add.asSubclass(Jmessage.class);
+                    //It isn't a Jmessage class this is correct!
+                    if (!Modifier.isAbstract(add.getModifiers())) {
+                        ret.add((Class<? extends Jmessage>) add);
+                    }
+                } catch (Exception ex) {
+                    //Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return ret;
     }
 }
