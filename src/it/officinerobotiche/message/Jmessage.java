@@ -36,7 +36,7 @@ public abstract class Jmessage {
     
     public abstract byte getType();
     
-    public abstract byte getType_message();
+    public abstract byte getTypeMessage();
     
     public abstract byte getCommand();
     

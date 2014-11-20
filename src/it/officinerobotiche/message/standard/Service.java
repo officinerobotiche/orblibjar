@@ -13,7 +13,7 @@ import it.officinerobotiche.message.Jmessage;
  */
 public class Service extends Jmessage {
 
-    public enum Type {
+    public enum NameService {
 
         RESET('*', "Reset"),
         DATE_CODE('d', "Date code"),
@@ -24,9 +24,13 @@ public class Service extends Jmessage {
         private final char name;
         private final String name_s;
 
-        private Type(char name, String name_s) {
+        private NameService(char name, String name_s) {
             this.name = name;
             this.name_s = name_s;
+        }
+        
+        public byte getByte() {
+            return (byte) name;
         }
 
         public char getName() {
@@ -39,33 +43,50 @@ public class Service extends Jmessage {
         }
     }
     
-    private final byte type;
+    
     /**
      * type packet: * (D) Default messages (in top on this file) 
      * * other type messages (in UNAV file)
      */
-    public final static byte type_message = (byte) 'D';
-    
+    public final static byte TYPE_MESSAGE = (byte) 'D';
     /**
      * command message
      */
-    public final static byte command = 0;
-    
+    public final static byte[] ALL_COMMANDS = {0};
+    private byte command;
     private final static int BUFF_SERVICE = 20;
-    private byte[] data = new byte[BUFF_SERVICE + 1];
+    private byte[] data;
+    private String name_service;
+    private final byte type;
     
-    public Service(byte type, byte[] data) {
-        this.type = type;
+    public Service(byte command, byte[] data) {
         this.data = data;
+        this.command = command;
+        name_service = decodeService(data[0]);
+        type = Jmessage.Type.DATA.getName();
     }
     
-    public Service(char name) {
+    public Service(NameService name) {
         type = Jmessage.Type.REQUEST.getName();
-        data[0] = (byte) name;
+        data = new byte[BUFF_SERVICE + 1];
+        data[0] = name.getByte();
+    }
+    
+    private String decodeService(byte name_service) {
+        if(name_service == NameService.AUTHOR.getByte()) {
+            return NameService.AUTHOR.toString();
+        } else if (name_service == NameService.DATE_CODE.getByte()) {
+            return NameService.DATE_CODE.toString();
+        } else if (name_service == NameService.NAME_BOARD.getByte()) {
+            return NameService.NAME_BOARD.toString();
+        } else if (name_service == NameService.VERSION.getByte()) {
+            return NameService.VERSION.toString();
+        }
+        return null;
     }
     
     public String getName() {
-        return null;
+        return name_service;
     }
     
     @Override
@@ -79,13 +100,13 @@ public class Service extends Jmessage {
     }
 
     @Override
-    public byte getType_message() {
-        return type_message;
+    public byte getTypeMessage() {
+        return TYPE_MESSAGE;
     }
 
     @Override
     public byte getCommand() {
-        return command;
+        return ALL_COMMANDS[0];
     }
 
     @Override

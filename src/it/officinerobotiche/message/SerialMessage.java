@@ -9,6 +9,7 @@ import it.officinerobotiche.serial.Packet;
 import it.officinerobotiche.serial.SerialPacket;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -28,8 +29,8 @@ public class SerialMessage extends SerialPacket {
     private final static char DOT = '.';
     private final static char SLASH = '/';
     private final static String CLASS_SUFFIX = ".class";
-    private final static String FIELD_TYPE_MESSAGE = "type_message";
-    private final static String FIELD_COMMAND = "command";
+    private final static String FIELD_TYPE_MESSAGE = "TYPE_MESSAGE";
+    private final static String FIELD_COMMAND = "ALL_COMMANDS";
     // List all messages
     private final List<Class<? extends Jmessage>> allClasses;
 
@@ -70,12 +71,17 @@ public class SerialMessage extends SerialPacket {
             try {
                 for (Class<? extends Jmessage> message : allClasses) {
                     //Find the correct Jmessage
-                    if (data[i + 2] == getFromField(message, FIELD_TYPE_MESSAGE)
-                            && data[i + 3] == getFromField(message, FIELD_COMMAND)) {
-                        //Add data array
-                        byte[] data_message = new byte[data[i]];
-                        System.arraycopy(data, i + 4, data, 0, data[i]);
-                        list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class).newInstance(data[i + 1], data_message));
+                    if (data[i + 2] == getFromField(message, FIELD_TYPE_MESSAGE)) {
+                        byte[] commands = getArrayFromField(message, FIELD_COMMAND);
+                        for (byte j : commands) {
+                            if (data[i + 3] == j) {
+                                //Add data array
+                                byte[] data_message = new byte[data[i]];
+                                System.arraycopy(data, i + 4, data, 0, data[i]);
+                                list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class)
+                                        .newInstance(data[i + 1], data_message));
+                            }
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -85,12 +91,21 @@ public class SerialMessage extends SerialPacket {
         return list_receive;
     }
 
-    private byte getFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+    private static byte getFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field type_field = message.getField(name_field);
         if (type_field.getType() == byte.class) {
             return type_field.getByte(null);
         }
         return 0;
+    }
+
+    public static byte[] getArrayFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field type_field = message.getField(name_field);
+        if (type_field.getType().isArray()) {
+            return (byte[]) type_field.get(null);
+        } else {
+            return null;
+        }
     }
 
     private <P extends Jmessage> Packet sendMessage(boolean sync, P message) throws InterruptedException {
@@ -111,7 +126,7 @@ public class SerialMessage extends SerialPacket {
         ArrayList<Byte> data = new ArrayList<Byte>();
         data.add(message.getLength());
         data.add(message.getType());
-        data.add(message.getType_message());
+        data.add(message.getTypeMessage());
         data.add(message.getCommand());
         for (byte i : message.getData()) {
             data.add(i);
