@@ -13,6 +13,10 @@ import java.util.ArrayList;
 public abstract class Jmessage {
 
     protected final static byte LNG_HEADER = (byte) 4;
+    
+    public interface Command {
+        public byte getNumber();
+    }
 
     protected static enum Type {
 
@@ -32,13 +36,18 @@ public abstract class Jmessage {
         }
     }
     
+    public abstract boolean isACK();
+    
     public abstract byte getLength();
     
-    public abstract byte getType();
+    public abstract Type getType();
     
     public abstract byte getTypeMessage();
     
     public abstract byte getCommand();
     
     public abstract byte[] getData();
+    
+    @Override
+    public abstract String toString();
 }

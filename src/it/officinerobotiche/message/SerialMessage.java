@@ -5,6 +5,7 @@
  */
 package it.officinerobotiche.message;
 
+import it.officinerobotiche.message.Jmessage.Command;
 import it.officinerobotiche.serial.Packet;
 import it.officinerobotiche.serial.SerialPacket;
 import java.io.File;
@@ -60,8 +61,13 @@ public class SerialMessage extends SerialPacket {
         return (P) parsePacket(sendMessage(true, message)).get(0);
     }
 
-    public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) throws InterruptedException {
-        return parsePacket(sendMessage(true, message));
+    public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) {
+        try {
+            return parsePacket(sendMessage(true, message));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     public <P extends Jmessage> ArrayList<P> parsePacket(Packet packet) {
@@ -71,13 +77,13 @@ public class SerialMessage extends SerialPacket {
             try {
                 for (Class<? extends Jmessage> message : allClasses) {
                     //Find the correct Jmessage
-                    if (data[i + 2] == getFromField(message, FIELD_TYPE_MESSAGE)) {
+                    if (data[i + 2] == getByteFromField(message, FIELD_TYPE_MESSAGE)) {
                         byte[] commands = getArrayFromField(message, FIELD_COMMAND);
                         for (byte j : commands) {
                             if (data[i + 3] == j) {
                                 //Add data array
-                                byte[] data_message = new byte[data[i]];
-                                System.arraycopy(data, i + 4, data, 0, data[i]);
+                                byte[] data_message = new byte[data[i] - Jmessage.LNG_HEADER];
+                                System.arraycopy(data, i + Jmessage.LNG_HEADER, data_message, 0, data[i] - Jmessage.LNG_HEADER);
                                 list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class)
                                         .newInstance(data[i + 1], data_message));
                             }
@@ -91,7 +97,23 @@ public class SerialMessage extends SerialPacket {
         return list_receive;
     }
 
-    private static byte getFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+    static public <E extends Enum<E>> Class<?> getEnum(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException {
+        Class<?>[] enumConstants2 = message.getClasses();
+        for (Class<?> i : enumConstants2) {
+            if (i.isEnum()) {
+                Class<?>[] interfaces = i.getInterfaces();
+                for (Class<?> j : interfaces) {
+                    if (j.equals(Jmessage.Command.class)) {
+                        return i;
+                    }
+                }
+
+            }
+        }
+        return null;
+    }
+    
+    private static byte getByteFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field type_field = message.getField(name_field);
         if (type_field.getType() == byte.class) {
             return type_field.getByte(null);
@@ -125,11 +147,13 @@ public class SerialMessage extends SerialPacket {
     private <P extends Jmessage> ArrayList<Byte> getMessage(P message) {
         ArrayList<Byte> data = new ArrayList<Byte>();
         data.add(message.getLength());
-        data.add(message.getType());
+        data.add(message.getType().getName());
         data.add(message.getTypeMessage());
         data.add(message.getCommand());
-        for (byte i : message.getData()) {
-            data.add(i);
+        if (message.getData() != null) {
+            for (byte i : message.getData()) {
+                data.add(i);
+            }
         }
         return data;
     }
