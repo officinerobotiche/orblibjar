@@ -5,12 +5,9 @@
  */
 package it.officinerobotiche.message;
 
-import it.officinerobotiche.message.Jmessage.Command;
-import it.officinerobotiche.serial.Packet;
-import it.officinerobotiche.serial.SerialPacket;
+import it.officinerobotiche.serial.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -25,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author Raffaello Bonghi
  */
-public class SerialMessage extends SerialPacket {
+public class SerialMessage extends SerialPacket implements PacketListener {
 
     private final static char DOT = '.';
     private final static char SLASH = '/';
@@ -39,6 +36,11 @@ public class SerialMessage extends SerialPacket {
         super(portName);
         //Load all messages with extension Jmessage 
         allClasses = SerialMessage.getJmessageClasses(SerialMessage.class.getPackage().getName());
+    }
+    
+    @Override
+    public void asyncPacketEvent(PacketEvent evt) {
+        ArrayList<Jmessage> parsePacket = parsePacket(evt.getPacket());
     }
 
     public <P extends Jmessage> void sendASyncMessage(P message) {
@@ -103,9 +105,9 @@ public class SerialMessage extends SerialPacket {
             if (i.isEnum()) {
                 Class<?>[] interfaces = i.getInterfaces();
                 for (Class<?> j : interfaces) {
-                    if (j.equals(Jmessage.Command.class)) {
-                        return i;
-                    }
+//                    if (j.equals(Jmessage.Command.class)) {
+//                        return i;
+//                    }
                 }
 
             }
@@ -146,15 +148,15 @@ public class SerialMessage extends SerialPacket {
 
     private <P extends Jmessage> ArrayList<Byte> getMessage(P message) {
         ArrayList<Byte> data = new ArrayList<Byte>();
-        data.add(message.getLength());
-        data.add(message.getType().getName());
-        data.add(message.getTypeMessage());
-        data.add(message.getCommand());
-        if (message.getData() != null) {
-            for (byte i : message.getData()) {
-                data.add(i);
-            }
-        }
+//        data.add(message.getLength());
+//        data.add(message.getType().getName());
+//        data.add(message.getTypeMessage());
+//        data.add(message.getCommand());
+//        if (message.getData() != null) {
+//            for (byte i : message.getData()) {
+//                data.add(i);
+//            }
+//        }
         return data;
     }
 
@@ -218,7 +220,7 @@ public class SerialMessage extends SerialPacket {
                     // Load all classes with
                     Class<? extends Jmessage> asSubclass = add.asSubclass(Jmessage.class);
                     //It isn't a Jmessage class this is correct!
-                    if (!Modifier.isAbstract(add.getModifiers())) {
+                    if (!Modifier.isAbstract(asSubclass.getModifiers()) && add.isEnum()) {
                         ret.add((Class<? extends Jmessage>) add);
                     }
                 } catch (Exception ex) {

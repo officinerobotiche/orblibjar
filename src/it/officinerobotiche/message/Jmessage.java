@@ -4,21 +4,35 @@
  */
 package it.officinerobotiche.message;
 
-import java.util.ArrayList;
-
 /**
- *
- * @author Raffaello bonghi
+ * 
+ * @author Raffaello Bonghi
  */
-public abstract class Jmessage {
+public interface Jmessage {
 
-    protected final static byte LNG_HEADER = (byte) 4;
-    
-    public interface Command {
-        public byte getNumber();
+    public final static byte LNG_HEADER = (byte) 4;
+
+    public enum TypeMessage {
+
+        DEFAULT('D'),
+        UNAV('U');
+
+        private final char name;
+
+        private TypeMessage(char name) {
+            this.name = name;
+        }
+
+        public char getName() {
+            return name;
+        }
+
+        public byte getByte() {
+            return (byte) name;
+        }
     }
 
-    protected static enum Type {
+    public static enum Information {
 
         REQUEST('R'),
         DATA('D'),
@@ -27,27 +41,31 @@ public abstract class Jmessage {
 
         private final char name;
 
-        private Type(char name) {
+        private Information(char name) {
             this.name = name;
         }
 
-        public final byte getName() {
+        public final byte getByte() {
             return (byte) name;
         }
     }
     
-    public abstract boolean isACK();
-    
-    public abstract byte getLength();
-    
-    public abstract Type getType();
-    
-    public abstract byte getTypeMessage();
-    
-    public abstract byte getCommand();
-    
-    public abstract byte[] getData();
-    
-    @Override
-    public abstract String toString();
+    public interface MessageClassListener {
+
+        public void handleMyEventClassEvent();
+    }
+
+    public <P extends Jmessage> P set(byte[] data);
+
+    public <P extends Jmessage> P set(Information info);
+
+    public byte getNumber();
+
+    public Information getInformation();
+
+    public <P extends Jmessage> P get(byte Value);
+
+    public void addMessageListener(MessageClassListener listener);
+
+    public void removeMessageListener(MessageClassListener listener);
 }

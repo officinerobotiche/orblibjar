@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial;
+package it.officinerobotiche.message;
 
 import java.util.EventObject;
 
@@ -11,15 +11,15 @@ import java.util.EventObject;
  *
  * @author Raffaello
  */
-public class PacketEvent extends EventObject {
+public class MessageEvent extends EventObject {
 
-    private final Packet packet;
-    public PacketEvent(Object source) {
+    private final Jmessage packet;
+    public MessageEvent(Object source) {
         super(source);
-        packet = (Packet) source;
+        packet = (Jmessage) source;
     }
     
-    public Packet getPacket() {
+    public Jmessage getPacket() {
         return packet;
     }
     

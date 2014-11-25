@@ -6,164 +6,132 @@
 package it.officinerobotiche.message.standard;
 
 import it.officinerobotiche.message.Jmessage;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author Raffaello
  */
-public class Service extends Jmessage {
+public enum Service implements Jmessage {
+
+    SERVICE(0);
 
     private final static int BUFF_SERVICE = 20;
+    private List listeners = new ArrayList();
 
     public enum NameService {
 
-        RESET('*', "Reset"),
-        DATE_CODE('d', "Date code"),
-        NAME_BOARD('n', "Name board"),
-        VERSION('v', "Version code"),
-        AUTHOR('a', "Author");
+        RESET('*'),
+        DATE_CODE('d'),
+        NAME_BOARD('n'),
+        VERSION('v'),
+        AUTHOR('a');
 
         private final char name;
-        private final String name_s;
+        private static final Map<Character, NameService> lookup = new HashMap<>();
 
-        private NameService(char name, String name_s) {
+        private NameService(char name) {
             this.name = name;
-            this.name_s = name_s;
-        }
-
-        public byte getByte() {
-            return (byte) name;
         }
 
         public char getName() {
             return name;
         }
 
-        @Override
-        public String toString() {
-            return name_s;
+        public byte getByte() {
+            return (byte) name;
         }
-        
-        private static final Map<Character, NameService> lookup = new HashMap<>();
 
         static {
             for (NameService s : EnumSet.allOf(NameService.class)) {
                 lookup.put(s.getName(), s);
             }
         }
-        
-        public static NameService get(byte Value) { 
-        //the reverse lookup by simply getting 
-        //the value from the lookup HashMap. 
-          return lookup.get(Value); 
-     }
+
+        public static NameService get(byte Value) {
+            //the reverse lookup by simply getting 
+            //the value from the lookup HsahMap. 
+            return lookup.get(Value);
+        }
+    };
+
+    private Information information = null;
+    public final char type = TypeMessage.DEFAULT.getName();
+    private final byte number;
+    private byte[] data = null;
+    /**/
+    private String name;
+
+    private Service(int number) {
+        this.number = (byte) number;
     }
 
-    private static enum ServiceCommand implements Command {
-
-        SERVICE;
-
-        @Override
-        public byte getNumber() {
-            return 0;
-        }
-        
-        public static ServiceCommand get(byte Value) {
-            return SERVICE;
-        }
-
-    }
-
-    /**
-     * type packet: * (D) Default messages (in top on this file) * other type
-     * messages (in UNAV file)
-     */
-    public final static byte TYPE_MESSAGE = (byte) 'D';
-    /**
-     * command message
-     */
-    public final static byte[] ALL_COMMANDS = {0};
-    private final byte[] data;
-    private byte command;
-    private final Type type;
-
-    private String name_service;
-
-    public Service(byte command, byte[] data) {
+    @Override
+    public Service set(byte[] data) {
         this.data = data;
-        this.command = command;
-        byte[] info_data = new byte[BUFF_SERVICE];
-        System.arraycopy(data, 1, info_data, 0, info_data.length);
-        name_service = decodeService(NameService.get(data[0]), new String(info_data));
-        type = Jmessage.Type.DATA;
+        this.information = Information.DATA;
+        return this;
     }
 
-    public Service(NameService name) {
-        type = Jmessage.Type.REQUEST;
-        data = new byte[BUFF_SERVICE + 1];
-        data[0] = name.getByte();
-        this.command = ServiceCommand.SERVICE.getNumber();
+    @Override
+    public Service set(Information info) {
+        this.information = info;
+        return this;
+    }
+
+    public Service set(NameService name) {
+        this.information = Information.REQUEST;
+        this.data = new byte[BUFF_SERVICE + 1];
+        this.data[0] = name.getByte();
+        return this;
     }
 
     private String decodeService(NameService name_service, String board) {
-        String data = "";
-        switch(name_service) {
+        String name = "";
+        switch (name_service) {
             case AUTHOR:
-                data += NameService.AUTHOR.toString();
+                name += NameService.AUTHOR.toString();
                 break;
             case DATE_CODE:
-                data += NameService.DATE_CODE.toString();
+                name += NameService.DATE_CODE.toString();
                 break;
             case NAME_BOARD:
-                data += NameService.NAME_BOARD.toString();
+                name += NameService.NAME_BOARD.toString();
                 break;
             case VERSION:
-                data += NameService.VERSION.toString();
+                name += NameService.VERSION.toString();
                 break;
         }
-        return data + ": " + board;
-    }
-
-    public String getName() {
-        return name_service;
+        return name + ": " + board;
     }
 
     @Override
-    public boolean isACK() {
-        return type.equals(Jmessage.Type.ACK) || type.equals(Jmessage.Type.NACK);
+    public byte getNumber() {
+        return number;
     }
 
     @Override
-    public byte getLength() {
-        return (byte) (Jmessage.LNG_HEADER + BUFF_SERVICE + 1);
+    public Information getInformation() {
+        return information;
     }
 
     @Override
-    public Type getType() {
-        return type;
+    public Service get(byte Value) {
+        return SERVICE;
     }
 
     @Override
-    public byte getTypeMessage() {
-        return TYPE_MESSAGE;
+    public void addMessageListener(MessageClassListener listener) {
+        this.listeners.add(listener);
     }
 
     @Override
-    public byte getCommand() {
-        return ServiceCommand.SERVICE.getNumber();
-    }
-
-    @Override
-    public byte[] getData() {
-        return data;
-    }
-
-    @Override
-    public String toString() {
-        return "Service{" + "data=" + data + ", command=" + command + ", type=" + type + ", name_service=" + name_service + '}';
+    public void removeMessageListener(MessageClassListener listener) {
+        this.listeners.remove(listener);
     }
 
 }
