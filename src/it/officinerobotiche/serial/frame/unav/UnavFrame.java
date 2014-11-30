@@ -19,7 +19,17 @@ public abstract class UnavFrame extends AbstractFrame {
     public enum Command implements ICommand {
 
         PID_L(0, "PIDLeft"),
-        PID_R(1, "PIDRight");
+        PID_R(1, "PIDRight"),
+        MOTOR_L(2, "MotorLeft"),
+        MOTOR_R(3,"MotorRight"),
+        COORDINATE(4,"Coordinate"),
+        PARAM_MOTORS(5,"ParamMotors"),
+        CONSTRAINT(6,"Constraint"),
+        VELOCITY(7,"Velocity"),
+        VELOCITY_MIS(8,"VelocityMis"),
+        ENABLE(9,"Enable"),
+        EMERGENCY(10,"Emergency"),
+        DELTA_ODO(11,"DeltaOdo");
 
         private final int number;
         private final String name;

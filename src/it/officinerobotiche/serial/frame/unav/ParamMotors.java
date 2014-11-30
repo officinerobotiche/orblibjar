@@ -3,29 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial.frame.standard;
+package it.officinerobotiche.serial.frame.unav;
 
 /**
  *
  * @author Raffaello
  */
-public class NameProcess extends StandardFrame {
+public class ParamMotors extends UnavFrame {
     
-    public NameProcess() {
+    public ParamMotors() {
         super();
     }
 
-    public NameProcess(boolean sync, byte[] in) {
+    public ParamMotors(boolean sync, byte[] in) {
         super(sync, in);
     }
     
-    public NameProcess(boolean sync, Information info) {
+    public ParamMotors(boolean sync, Information info) {
         super(sync, info);
     }
-
+    
     @Override
     public Command getCommand() {
-        return Command.NAME_PROCESS;
+        return Command.PARAM_MOTORS;
     }
-
+    
 }

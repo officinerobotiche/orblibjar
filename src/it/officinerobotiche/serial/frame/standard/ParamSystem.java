@@ -11,12 +11,17 @@ package it.officinerobotiche.serial.frame.standard;
  */
 public class ParamSystem extends StandardFrame {
     
+    private int stepTimer;
+    private int timeMill;
+    
     public ParamSystem() {
         super();
     }
 
     public ParamSystem(boolean sync, byte[] in) {
         super(sync, in);
+        stepTimer = in[0];
+        timeMill = in[1];
     }
     
     public ParamSystem(boolean sync, Information info) {
@@ -28,4 +33,11 @@ public class ParamSystem extends StandardFrame {
         return Command.PARAMETER_SYSTEM;
     }
 
+    public int getStepTimer() {
+        return stepTimer;
+    }
+
+    public int getTimeMill() {
+        return timeMill;
+    }
 }
