@@ -22,7 +22,7 @@ public abstract class StandardFrame extends AbstractFrame {
         TIME_PROCESS(1, "Time"),
         PRIORITY_PROCESS(2, "Priority"),
         FRQ_PROCESS(3, "Frequency"),
-        PARAMETER_SYSTEM(4, "Parameter"),
+        PARAMETER_SYSTEM(4, "ParamSystem"),
         ERROR_SERIAL(5, "ErrorSerial"),
         NAME_PROCESS(6, "NameProcess");
 
@@ -56,7 +56,7 @@ public abstract class StandardFrame extends AbstractFrame {
             }
         }
 
-        public static String getFrame(int number) {
+        public static String getCommand(int number) {
             return lookup.get(number);
         }
     };

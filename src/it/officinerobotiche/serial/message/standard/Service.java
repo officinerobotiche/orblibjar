@@ -14,6 +14,8 @@ import java.util.Map;
  * @author Raffaello
  */
 public class Service extends StandardFrame {
+    
+    private final static int BUFF_SERVICE = 20;
 
     public enum NameService {
 
@@ -51,21 +53,51 @@ public class Service extends StandardFrame {
         }
     };
     
-    public Service() {
-        super();
+    private String name;
+    
+    public Service(NameService name) {
+        this.information = Information.REQUEST;
+        this.in = new byte[BUFF_SERVICE + 1];
+        this.in[0] = name.getByte();
     }
 
     public Service(byte[] in) {
         super(in);
+        byte[] data = new byte[BUFF_SERVICE];
+        System.arraycopy(in, 1, data, 0, BUFF_SERVICE);
+        this.name = new String(data);
     }
     
     public Service(Information info) {
         super(info);
     }
+    
+    private String decodeService(NameService name_service, String board) {
+        String name = "";
+        switch (name_service) {
+            case AUTHOR:
+                name += NameService.AUTHOR.toString();
+                break;
+            case DATE_CODE:
+                name += NameService.DATE_CODE.toString();
+                break;
+            case NAME_BOARD:
+                name += NameService.NAME_BOARD.toString();
+                break;
+            case VERSION:
+                name += NameService.VERSION.toString();
+                break;
+        }
+        return name + ": " + board;
+    }
 
     @Override
     public Command getCommand() {
         return Command.SERVICES;
+    }
+    
+    public String getInformation() {
+        return name;
     }
 
 }

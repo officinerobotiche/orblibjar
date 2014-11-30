@@ -15,6 +15,8 @@ import java.util.Map;
  * @author Raffaello
  */
 public abstract class AbstractFrame implements Jmessage {
+    
+    public static final int LNG_HEADER = 4;
 
     public static enum TypeMessage {
 
@@ -63,8 +65,8 @@ public abstract class AbstractFrame implements Jmessage {
 
     }
 
-    private final byte[] in;
-    private final Information information;
+    protected byte[] in;
+    protected Information information;
 
     public AbstractFrame() {
         this.in = null;
@@ -88,8 +90,8 @@ public abstract class AbstractFrame implements Jmessage {
     
     public ArrayList<Byte> getFrame() {
         int length = (in != null) ? in.length : 0;
-        ArrayList<Byte> frame = new ArrayList<>(Jmessage.LNG_HEADER + length);
-        frame.add((byte)(Jmessage.LNG_HEADER + length));
+        ArrayList<Byte> frame = new ArrayList<>(LNG_HEADER + length);
+        frame.add((byte)(LNG_HEADER + length));
         frame.add(information.getByte());
         frame.add(getTypeMessage().getByte());
         frame.add(getCommand().getByte());

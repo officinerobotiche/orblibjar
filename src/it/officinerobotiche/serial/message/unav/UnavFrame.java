@@ -51,7 +51,7 @@ public abstract class UnavFrame extends AbstractFrame {
             }
         }
 
-        public static String getFrame(int number) {
+        public static String getCommand(int number) {
             return lookup.get(number);
         }
     };

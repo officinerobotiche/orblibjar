@@ -6,6 +6,7 @@
 package it.officinerobotiche.serial.message;
 
 import it.officinerobotiche.serial.*;
+import it.officinerobotiche.serial.message.Jmessage.Information;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -31,7 +32,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
     private final static String CLASS_SUFFIX = ".class";
     private final static String SUBCLASS = "$";
     private final static String ENUM_COMMAND = "Command";
-    private final static String METHOD_FRAME = "getFrame";
+    private final static String METHOD_FRAME = "getCommand";
     // List all messages
     private final List<Class<? extends AbstractFrame>> allClasses;
 
@@ -43,37 +44,31 @@ public class SerialMessage extends SerialPacket implements PacketListener {
 
     @Override
     public void asyncPacketEvent(PacketEvent evt) {
-        List<? extends Jmessage> parsePacket = parsePacket(evt.getPacket());
+        List<? extends AbstractFrame> parsePacket = parsePacket(evt.getPacket());
     }
 
-    public <P extends Jmessage> void sendASyncMessage(P message) {
-//        try {
-//            sendMessage(false, message);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+    public <P extends AbstractFrame> void sendASyncMessage(P message) {
+        try {
+            sendMessage(false, message);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public <P extends Jmessage> void sendASyncMessage(ArrayList<P> message) {
-//        try {
-//            sendMessage(false, message);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+    public <P extends AbstractFrame> void sendASyncMessage(ArrayList<P> message) {
+        try {
+            sendMessage(false, message);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public <P extends Jmessage> P sendSyncMessage(P message) throws InterruptedException {
-//        return (P) parsePacket(sendMessage(true, message)).get(0);
-        return null;
+    public <P extends AbstractFrame> P sendSyncMessage(P message) throws InterruptedException {
+        return (P) parsePacket(sendMessage(true, message)).get(0);
     }
 
-    public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) {
-//        try {
-//            return parsePacket(sendMessage(true, message));
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        return null;
+    public <P extends AbstractFrame> List<AbstractFrame> sendSyncMessage(ArrayList<P> message) throws InterruptedException {
+        return parsePacket(sendMessage(true, message));
     }
 
     public List<AbstractFrame> parsePacket(Packet packet) {
@@ -81,22 +76,31 @@ public class SerialMessage extends SerialPacket implements PacketListener {
         byte[] data = packet.getDataStructure();
         for (int i = 0; i < data.length; i += data[i]) {
             try {
-                byte[] data_message = new byte[data[i] - Jmessage.LNG_HEADER];
-                /**
-                 * Command
-                 */
-                int command = data[i + 2];
-                
-                char type = (char) data[i + 3];
-                
+                // Find a correct frame
+                char type = (char) data[i + 2];
+                int command = data[i + 3];
                 String abstractClass = AbstractFrame.TypeMessage.getAbstractClass(type);
-                String frame = getFrame(abstractClass, command);
+                String frame = getNameFrame(abstractClass, command);
                 Class<? extends AbstractFrame> message = getClassFrame(abstractClass, frame);
 
-                Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(byte[].class);
-                System.arraycopy(data, i + Jmessage.LNG_HEADER, data_message, 0, data[i] - Jmessage.LNG_HEADER);
-                AbstractFrame newInstance = declaredConstructor.newInstance(data_message);
-                list_receive.add(newInstance);
+                Information get = Information.get(data[i + 1]);
+                // Data Message
+                switch (get) {
+                    case DATA:
+                        if (data[i] > AbstractFrame.LNG_HEADER) {
+                            byte[] data_message = new byte[data[i] - AbstractFrame.LNG_HEADER];
+                            System.arraycopy(data, i + AbstractFrame.LNG_HEADER, data_message, 0, data[i] - AbstractFrame.LNG_HEADER);
+                            Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(byte[].class);
+                            list_receive.add(declaredConstructor.newInstance(data_message));
+                        }
+                        break;
+
+                    case ACK:
+                    case NACK:
+                        Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(Information.class);
+                        list_receive.add(declaredConstructor.newInstance(get));
+                        break;
+                }
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -119,7 +123,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
         return null;
     }
 
-    private static String getFrame(String abstractClass, int comm_rec) {
+    private static String getNameFrame(String abstractClass, int comm_rec) {
         try {
             Class<?> forName = Class.forName(abstractClass + SUBCLASS + ENUM_COMMAND);
             Method method = forName.getMethod(METHOD_FRAME, int.class);
