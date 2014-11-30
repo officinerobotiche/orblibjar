@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.message;
+package it.officinerobotiche.serial.message;
 
 import it.officinerobotiche.serial.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -27,137 +29,119 @@ public class SerialMessage extends SerialPacket implements PacketListener {
     private final static char DOT = '.';
     private final static char SLASH = '/';
     private final static String CLASS_SUFFIX = ".class";
-    private final static String FIELD_TYPE_MESSAGE = "TYPE_MESSAGE";
-    private final static String FIELD_COMMAND = "ALL_COMMANDS";
+    private final static String SUBCLASS = "$";
+    private final static String ENUM_COMMAND = "Command";
+    private final static String METHOD_FRAME = "getFrame";
     // List all messages
-    private final List<Class<? extends Jmessage>> allClasses;
+    private final List<Class<? extends AbstractFrame>> allClasses;
 
     public SerialMessage(String portName) {
         super(portName);
         //Load all messages with extension Jmessage 
         allClasses = SerialMessage.getJmessageClasses(SerialMessage.class.getPackage().getName());
     }
-    
+
     @Override
     public void asyncPacketEvent(PacketEvent evt) {
-        ArrayList<Jmessage> parsePacket = parsePacket(evt.getPacket());
+        List<? extends Jmessage> parsePacket = parsePacket(evt.getPacket());
     }
 
     public <P extends Jmessage> void sendASyncMessage(P message) {
-        try {
-            sendMessage(false, message);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            sendMessage(false, message);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     public <P extends Jmessage> void sendASyncMessage(ArrayList<P> message) {
-        try {
-            sendMessage(false, message);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            sendMessage(false, message);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     public <P extends Jmessage> P sendSyncMessage(P message) throws InterruptedException {
-        return (P) parsePacket(sendMessage(true, message)).get(0);
-    }
-
-    public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) {
-        try {
-            return parsePacket(sendMessage(true, message));
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        return (P) parsePacket(sendMessage(true, message)).get(0);
         return null;
     }
 
-    public <P extends Jmessage> ArrayList<P> parsePacket(Packet packet) {
-        ArrayList<P> list_receive = new ArrayList<>();
+    public <P extends Jmessage> ArrayList<P> sendSyncMessage(ArrayList<P> message) {
+//        try {
+//            return parsePacket(sendMessage(true, message));
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        return null;
+    }
+
+    public List<AbstractFrame> parsePacket(Packet packet) {
+        ArrayList<AbstractFrame> list_receive = new ArrayList<>();
         byte[] data = packet.getDataStructure();
         for (int i = 0; i < data.length; i += data[i]) {
             try {
-                for (Class<? extends Jmessage> message : allClasses) {
-                    //Find the correct Jmessage
-                    if (data[i + 2] == getByteFromField(message, FIELD_TYPE_MESSAGE)) {
-                        byte[] commands = getArrayFromField(message, FIELD_COMMAND);
-                        for (byte j : commands) {
-                            if (data[i + 3] == j) {
-                                //Add data array
-                                byte[] data_message = new byte[data[i] - Jmessage.LNG_HEADER];
-                                System.arraycopy(data, i + Jmessage.LNG_HEADER, data_message, 0, data[i] - Jmessage.LNG_HEADER);
-                                list_receive.add((P) message.getDeclaredConstructor(byte.class, byte[].class)
-                                        .newInstance(data[i + 1], data_message));
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
+                byte[] data_message = new byte[data[i] - Jmessage.LNG_HEADER];
+                /**
+                 * Command
+                 */
+                int command = data[i + 2];
+                
+                char type = (char) data[i + 3];
+                
+                String abstractClass = AbstractFrame.TypeMessage.getAbstractClass(type);
+                String frame = getFrame(abstractClass, command);
+                Class<? extends AbstractFrame> message = getClassFrame(abstractClass, frame);
+
+                Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(byte[].class);
+                System.arraycopy(data, i + Jmessage.LNG_HEADER, data_message, 0, data[i] - Jmessage.LNG_HEADER);
+                AbstractFrame newInstance = declaredConstructor.newInstance(data_message);
+                list_receive.add(newInstance);
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return list_receive;
     }
 
-    static public <E extends Enum<E>> Class<?> getEnum(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException {
-        Class<?>[] enumConstants2 = message.getClasses();
-        for (Class<?> i : enumConstants2) {
-            if (i.isEnum()) {
-                Class<?>[] interfaces = i.getInterfaces();
-                for (Class<?> j : interfaces) {
-//                    if (j.equals(Jmessage.Command.class)) {
-//                        return i;
-//                    }
+    private Class<? extends AbstractFrame> getClassFrame(String abstractClass, String frame) {
+        for (Class<? extends AbstractFrame> classMes : allClasses) {
+            try {
+                Class<? extends AbstractFrame> asSubclass = (Class<? extends AbstractFrame>) classMes.asSubclass(Class.forName(abstractClass));
+                if (asSubclass.getSimpleName().equals(frame)) {
+                    return asSubclass;
                 }
-
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassCastException ex) {
             }
         }
         return null;
     }
-    
-    private static byte getByteFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field type_field = message.getField(name_field);
-        if (type_field.getType() == byte.class) {
-            return type_field.getByte(null);
-        }
-        return 0;
-    }
 
-    public static byte[] getArrayFromField(Class<? extends Jmessage> message, String name_field) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field type_field = message.getField(name_field);
-        if (type_field.getType().isArray()) {
-            return (byte[]) type_field.get(null);
-        } else {
+    private static String getFrame(String abstractClass, int comm_rec) {
+        try {
+            Class<?> forName = Class.forName(abstractClass + SUBCLASS + ENUM_COMMAND);
+            Method method = forName.getMethod(METHOD_FRAME, int.class);
+            return (String) method.invoke(null, comm_rec);
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
 
-    private <P extends Jmessage> Packet sendMessage(boolean sync, P message) throws InterruptedException {
+    private <P extends AbstractFrame> Packet sendMessage(boolean sync, P message) throws InterruptedException {
         Packet packet = new Packet(sync);
-        packet.addMessage(getMessage(message));
+        packet.addMessage(message.getFrame());
         return super.sendPacket(packet);
     }
 
-    private <P extends Jmessage> Packet sendMessage(boolean sync, ArrayList<P> message) throws InterruptedException {
+    private <P extends AbstractFrame> Packet sendMessage(boolean sync, ArrayList<P> message) throws InterruptedException {
         Packet packet = new Packet(sync);
         for (P message_i : message) {
-            packet.addMessage(getMessage(message_i));
+            packet.addMessage(message_i.getFrame());
         }
         return super.sendPacket(packet);
-    }
-
-    private <P extends Jmessage> ArrayList<Byte> getMessage(P message) {
-        ArrayList<Byte> data = new ArrayList<Byte>();
-//        data.add(message.getLength());
-//        data.add(message.getType().getName());
-//        data.add(message.getTypeMessage());
-//        data.add(message.getCommand());
-//        if (message.getData() != null) {
-//            for (byte i : message.getData()) {
-//                data.add(i);
-//            }
-//        }
-        return data;
     }
 
     /**
@@ -167,11 +151,11 @@ public class SerialMessage extends SerialPacket implements PacketListener {
      * @param packageName The top level package to search.
      * @return The list of all @UnitTestable classes.
      */
-    public static final List<Class<? extends Jmessage>> getJmessageClasses(String packageName) {
+    private static List<Class<? extends AbstractFrame>> getJmessageClasses(String packageName) {
         // State what package we are exploring
         System.out.println("Exploring package: " + packageName);
         // Create the list that will hold the testable classes
-        List<Class<? extends Jmessage>> ret = new ArrayList<Class<? extends Jmessage>>();
+        List<Class<? extends AbstractFrame>> ret = new ArrayList<>();
         // Load a class loader.
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         // Convert the package path to file path
@@ -218,10 +202,10 @@ public class SerialMessage extends SerialPacket implements PacketListener {
                     // Try loading the class
                     Class<?> add = Class.forName(packageName + DOT + classFile.substring(0, classFile.length() - 6));
                     // Load all classes with
-                    Class<? extends Jmessage> asSubclass = add.asSubclass(Jmessage.class);
+                    Class<? extends AbstractFrame> asSubclass = add.asSubclass(AbstractFrame.class);
                     //It isn't a Jmessage class this is correct!
-                    if (!Modifier.isAbstract(asSubclass.getModifiers()) && add.isEnum()) {
-                        ret.add((Class<? extends Jmessage>) add);
+                    if (!Modifier.isAbstract(asSubclass.getModifiers())) {
+                        ret.add(asSubclass);
                     }
                 } catch (Exception ex) {
                     //Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
