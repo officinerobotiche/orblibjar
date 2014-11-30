@@ -13,6 +13,5 @@ import java.util.EventListener;
  */
 public interface ParserListener extends EventListener {
     
-    public void defaultMessagesEvent(FrameEvent evt);
-    public void syncMessagesEvent(FrameEvent evt);
+    public void frameEvent(FrameEvent evt);
 }

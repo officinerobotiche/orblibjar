@@ -60,5 +60,7 @@ public interface Jmessage {
     }
 
     public <P extends ICommand> P getCommand();
+    
+    public boolean isAsync();
 
 }

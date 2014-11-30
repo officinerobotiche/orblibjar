@@ -61,8 +61,8 @@ public class Service extends StandardFrame {
         this.in[0] = name.getByte();
     }
 
-    public Service(byte[] in) {
-        super(in);
+    public Service(boolean async, byte[] in) {
+        super(async, in);
         byte[] data = new byte[BUFF_SERVICE];
         System.arraycopy(in, 1, data, 0, BUFF_SERVICE);
         this.name = new String(data);

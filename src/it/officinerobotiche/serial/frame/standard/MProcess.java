@@ -17,8 +17,8 @@ public abstract class MProcess extends StandardFrame {
             super();
         }
 
-        public Time(byte[] in) {
-            super(in);
+        public Time(boolean async, byte[] in) {
+            super(async, in);
         }
         
         public Time(Information info) {
@@ -37,8 +37,8 @@ public abstract class MProcess extends StandardFrame {
             super();
         }
 
-        public Priority(byte[] in) {
-            super(in);
+        public Priority(boolean async, byte[] in) {
+            super(async, in);
         }
         
         public Priority(Information info) {
@@ -58,8 +58,8 @@ public abstract class MProcess extends StandardFrame {
             super();
         }
 
-        public Frequency(byte[] in) {
-            super(in);
+        public Frequency(boolean async, byte[] in) {
+            super(async, in);
         }
         
         public Frequency(Information info) {
@@ -80,8 +80,8 @@ public abstract class MProcess extends StandardFrame {
         super();
     }
 
-    public MProcess(byte[] in) {
-        super(in);
+    public MProcess(boolean async, byte[] in) {
+        super(async, in);
     }
     
     public MProcess(Information info) {

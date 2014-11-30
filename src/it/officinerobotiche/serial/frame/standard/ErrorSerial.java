@@ -17,8 +17,8 @@ public class ErrorSerial extends StandardFrame {
         super();
     }
 
-    public ErrorSerial(byte[] in) {
-        super(in);
+    public ErrorSerial(boolean async, byte[] in) {
+        super(async, in);
     }
     
     public ErrorSerial(Jmessage.Information info) {

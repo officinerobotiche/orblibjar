@@ -17,8 +17,8 @@ public class NameProcess extends StandardFrame {
         super();
     }
 
-    public NameProcess(byte[] in) {
-        super(in);
+    public NameProcess(boolean async, byte[] in) {
+        super(async, in);
     }
     
     public NameProcess(Jmessage.Information info) {

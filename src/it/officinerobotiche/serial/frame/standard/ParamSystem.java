@@ -17,8 +17,8 @@ public class ParamSystem extends StandardFrame {
         super();
     }
 
-    public ParamSystem(byte[] in) {
-        super(in);
+    public ParamSystem(boolean async, byte[] in) {
+        super(async, in);
     }
     
     public ParamSystem(Jmessage.Information info) {

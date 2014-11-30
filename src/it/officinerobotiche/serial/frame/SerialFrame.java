@@ -20,6 +20,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.EventListenerList;
 
 /**
  *
@@ -36,6 +37,8 @@ public class SerialFrame extends SerialPacket implements PacketListener {
     // List all messages
     private final List<Class<? extends AbstractFrame>> allClasses;
 
+    protected EventListenerList listenerList = new EventListenerList();
+
     public SerialFrame(String portName) {
         super(portName);
         //Load all messages with extension Jmessage 
@@ -44,7 +47,26 @@ public class SerialFrame extends SerialPacket implements PacketListener {
 
     @Override
     public void asyncPacketEvent(PacketEvent evt) {
-        List<? extends AbstractFrame> parsePacket = parsePacket(evt.getPacket());
+        for (AbstractFrame frame : parsePacket(evt.getPacket())) {
+            fireFrameEvent(new FrameEvent(frame));
+        }
+    }
+
+    public void addFrameEventListener(PacketListener listener) {
+        listenerList.add(PacketListener.class, listener);
+    }
+
+    public void removeFrameEventListener(PacketListener listener) {
+        listenerList.remove(PacketListener.class, listener);
+    }
+
+    private void fireFrameEvent(FrameEvent evt) {
+        Object[] listeners = listenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == ParserListener.class) {
+                ((ParserListener) listeners[i + 1]).frameEvent(evt);
+            }
+        }
     }
 
     public <P extends AbstractFrame> void sendASyncMessage(P message) {
