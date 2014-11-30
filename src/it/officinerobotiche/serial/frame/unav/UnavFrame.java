@@ -60,12 +60,12 @@ public abstract class UnavFrame extends AbstractFrame {
         super();
     }
 
-    public UnavFrame(boolean async, byte[] in) {
-        super(async, in);
+    public UnavFrame(boolean sync, byte[] in) {
+        super(sync, in);
     }
 
-    public UnavFrame(Information info) {
-        super(info);
+    public UnavFrame(boolean sync, Information info) {
+        super(sync, info);
     }
 
     @Override

@@ -5,8 +5,6 @@
  */
 package it.officinerobotiche.serial.frame.standard;
 
-import it.officinerobotiche.serial.frame.Jmessage;
-
 /**
  *
  * @author Raffaello
@@ -17,17 +15,17 @@ public class ParamSystem extends StandardFrame {
         super();
     }
 
-    public ParamSystem(boolean async, byte[] in) {
-        super(async, in);
+    public ParamSystem(boolean sync, byte[] in) {
+        super(sync, in);
     }
     
-    public ParamSystem(Jmessage.Information info) {
-        super(info);
+    public ParamSystem(boolean sync, Information info) {
+        super(sync, info);
     }
 
     @Override
-    public StandardFrame.Command getCommand() {
-        return StandardFrame.Command.PARAMETER_SYSTEM;
+    public Command getCommand() {
+        return Command.PARAMETER_SYSTEM;
     }
 
 }

@@ -61,15 +61,15 @@ public class Service extends StandardFrame {
         this.in[0] = name.getByte();
     }
 
-    public Service(boolean async, byte[] in) {
-        super(async, in);
+    public Service(boolean sync, byte[] in) {
+        super(sync, in);
         byte[] data = new byte[BUFF_SERVICE];
         System.arraycopy(in, 1, data, 0, BUFF_SERVICE);
         this.name = new String(data);
     }
     
-    public Service(Information info) {
-        super(info);
+    public Service(boolean sync, Information info) {
+        super(sync, info);
     }
     
     private String decodeService(NameService name_service, String board) {

@@ -65,12 +65,12 @@ public abstract class StandardFrame extends AbstractFrame {
         super();
     }
 
-    public StandardFrame(boolean async, byte[] in) {
-        super(async, in);
+    public StandardFrame(boolean sync, byte[] in) {
+        super(sync, in);
     }
     
-    public StandardFrame(Information info) {
-        super(info);
+    public StandardFrame(boolean sync, Information info) {
+        super(sync, info);
     }
 
     @Override

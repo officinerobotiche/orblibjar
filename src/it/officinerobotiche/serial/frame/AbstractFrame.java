@@ -67,20 +67,22 @@ public abstract class AbstractFrame implements Jmessage {
 
     protected byte[] in;
     protected Information information;
-    protected boolean async;
+    protected boolean sync;
 
     public AbstractFrame() {
+        this.sync = true;
         this.in = null;
         this.information = Information.REQUEST;
     }
 
-    public AbstractFrame(Information info) {
+    public AbstractFrame(boolean sync, Information info) {
+        this.sync = sync;
         this.in = null;
         this.information = info;
     }
 
-    public AbstractFrame(boolean async, byte[] in) {
-        this.async = async;
+    public AbstractFrame(boolean sync, byte[] in) {
+        this.sync = sync;
         this.in = in;
         this.information = Information.DATA;
     }
@@ -106,8 +108,8 @@ public abstract class AbstractFrame implements Jmessage {
     }
     
     @Override
-    public boolean isAsync() {
-        return async;
+    public boolean isSync() {
+        return sync;
     }
     //@Override
     //abstract public String toString();

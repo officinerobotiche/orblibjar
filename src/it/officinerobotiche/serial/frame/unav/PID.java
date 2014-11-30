@@ -15,12 +15,12 @@ public abstract class PID extends UnavFrame {
         super();
     }
 
-    public PID(boolean async, byte[] in) {
-        super(async, in);
+    public PID(boolean sync, byte[] in) {
+        super(sync, in);
     }
     
-    public PID(Information info) {
-        super(info);
+    public PID(boolean sync, Information info) {
+        super(sync, info);
     }
 
     public static class PIDLeft extends PID {
@@ -29,12 +29,12 @@ public abstract class PID extends UnavFrame {
             super();
         }
 
-        public PIDLeft(boolean async, byte[] in) {
-            super(async, in);
+        public PIDLeft(boolean sync, byte[] in) {
+            super(sync, in);
         }
         
-        public PIDLeft(Information info) {
-            super(info);
+        public PIDLeft(boolean sync, Information info) {
+            super(sync, info);
         }
 
         @Override
@@ -50,12 +50,12 @@ public abstract class PID extends UnavFrame {
             super();
         }
 
-        public PIDRight(boolean async, byte[] in) {
-            super(async, in);
+        public PIDRight(boolean sync, byte[] in) {
+            super(sync, in);
         }
         
-        public PIDRight(Information info) {
-            super(info);
+        public PIDRight(boolean sync, Information info) {
+            super(sync, info);
         }
 
         @Override

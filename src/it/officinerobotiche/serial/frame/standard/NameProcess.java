@@ -17,17 +17,17 @@ public class NameProcess extends StandardFrame {
         super();
     }
 
-    public NameProcess(boolean async, byte[] in) {
-        super(async, in);
+    public NameProcess(boolean sync, byte[] in) {
+        super(sync, in);
     }
     
-    public NameProcess(Jmessage.Information info) {
-        super(info);
+    public NameProcess(boolean sync, Information info) {
+        super(sync, info);
     }
 
     @Override
-    public StandardFrame.Command getCommand() {
-        return StandardFrame.Command.NAME_PROCESS;
+    public Command getCommand() {
+        return Command.NAME_PROCESS;
     }
 
 }

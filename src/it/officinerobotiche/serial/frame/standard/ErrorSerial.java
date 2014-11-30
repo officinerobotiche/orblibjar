@@ -5,8 +5,6 @@
  */
 package it.officinerobotiche.serial.frame.standard;
 
-import it.officinerobotiche.serial.frame.Jmessage;
-
 /**
  *
  * @author Raffaello
@@ -17,17 +15,17 @@ public class ErrorSerial extends StandardFrame {
         super();
     }
 
-    public ErrorSerial(boolean async, byte[] in) {
-        super(async, in);
+    public ErrorSerial(boolean sync, byte[] in) {
+        super(sync, in);
     }
     
-    public ErrorSerial(Jmessage.Information info) {
-        super(info);
+    public ErrorSerial(boolean sync, Information info) {
+        super(sync, info);
     }
 
     @Override
-    public StandardFrame.Command getCommand() {
-        return StandardFrame.Command.ERROR_SERIAL;
+    public Command getCommand() {
+        return Command.ERROR_SERIAL;
     }
 
 }
