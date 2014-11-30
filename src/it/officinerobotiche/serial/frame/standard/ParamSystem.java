@@ -3,31 +3,31 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial.message.standard;
+package it.officinerobotiche.serial.frame.standard;
 
-import it.officinerobotiche.serial.message.Jmessage;
+import it.officinerobotiche.serial.frame.Jmessage;
 
 /**
  *
  * @author Raffaello
  */
-public class ErrorSerial extends StandardFrame {
+public class ParamSystem extends StandardFrame {
     
-    public ErrorSerial() {
+    public ParamSystem() {
         super();
     }
 
-    public ErrorSerial(byte[] in) {
+    public ParamSystem(byte[] in) {
         super(in);
     }
     
-    public ErrorSerial(Jmessage.Information info) {
+    public ParamSystem(Jmessage.Information info) {
         super(info);
     }
 
     @Override
     public StandardFrame.Command getCommand() {
-        return StandardFrame.Command.ERROR_SERIAL;
+        return StandardFrame.Command.PARAMETER_SYSTEM;
     }
 
 }

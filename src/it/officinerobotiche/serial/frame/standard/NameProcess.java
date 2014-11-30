@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial.message.standard;
+package it.officinerobotiche.serial.frame.standard;
 
-import it.officinerobotiche.serial.message.Jmessage;
+import it.officinerobotiche.serial.frame.Jmessage;
 
 /**
  *

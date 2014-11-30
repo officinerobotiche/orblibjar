@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial.message;
+package it.officinerobotiche.serial.frame;
 
 import java.util.EnumSet;
 import java.util.HashMap;

@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial.message;
+package it.officinerobotiche.serial.frame;
 
 import it.officinerobotiche.serial.*;
-import it.officinerobotiche.serial.message.Jmessage.Information;
+import it.officinerobotiche.serial.frame.Jmessage.Information;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  *
  * @author Raffaello Bonghi
  */
-public class SerialMessage extends SerialPacket implements PacketListener {
+public class SerialFrame extends SerialPacket implements PacketListener {
 
     private final static char DOT = '.';
     private final static char SLASH = '/';
@@ -36,10 +36,10 @@ public class SerialMessage extends SerialPacket implements PacketListener {
     // List all messages
     private final List<Class<? extends AbstractFrame>> allClasses;
 
-    public SerialMessage(String portName) {
+    public SerialFrame(String portName) {
         super(portName);
         //Load all messages with extension Jmessage 
-        allClasses = SerialMessage.getJmessageClasses(SerialMessage.class.getPackage().getName());
+        allClasses = SerialFrame.getJmessageClasses(SerialFrame.class.getPackage().getName());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
         try {
             sendMessage(false, message);
         } catch (InterruptedException ex) {
-            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -59,7 +59,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
         try {
             sendMessage(false, message);
         } catch (InterruptedException ex) {
-            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -102,7 +102,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
                         break;
                 }
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return list_receive;
@@ -116,7 +116,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
                     return asSubclass;
                 }
             } catch (ClassNotFoundException ex) {
-                Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassCastException ex) {
             }
         }
@@ -129,7 +129,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
             Method method = forName.getMethod(METHOD_FRAME, int.class);
             return (String) method.invoke(null, comm_rec);
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -212,7 +212,7 @@ public class SerialMessage extends SerialPacket implements PacketListener {
                         ret.add(asSubclass);
                     }
                 } catch (Exception ex) {
-                    //Logger.getLogger(SerialMessage.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

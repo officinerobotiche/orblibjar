@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.officinerobotiche.serial.message;
+package it.officinerobotiche.serial.frame;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
