@@ -5,6 +5,8 @@
  */
 package it.officinerobotiche.serial.frame;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.Map;
  * @author Raffaello
  */
 public abstract class AbstractFrame implements Jmessage {
-    
+
     public static final int LNG_HEADER = 4;
 
     public static enum TypeMessage {
@@ -36,7 +38,7 @@ public abstract class AbstractFrame implements Jmessage {
         public char getName() {
             return name;
         }
-        
+
         public byte getByte() {
             return (byte) name;
         }
@@ -88,29 +90,44 @@ public abstract class AbstractFrame implements Jmessage {
     }
 
     abstract public TypeMessage getTypeMessage();
-    
+
     @Override
     abstract public ICommand getCommand();
-    
+
     public ArrayList<Byte> getFrame() {
         int length = (in != null) ? in.length : 0;
         ArrayList<Byte> frame = new ArrayList<>(LNG_HEADER + length);
-        frame.add((byte)(LNG_HEADER + length));
+        frame.add((byte) (LNG_HEADER + length));
         frame.add(information.getByte());
         frame.add(getTypeMessage().getByte());
         frame.add(getCommand().getByte());
-        if(in != null) {
+        if (in != null) {
             for (byte i : in) {
                 frame.add(i);
             }
         }
         return frame;
     }
-    
+
     @Override
     public boolean isSync() {
         return sync;
     }
+
+    protected static float getFloat(byte[] in, int pos) {
+        byte[] float_data = new byte[4];
+        System.arraycopy(in, pos, float_data, 0, 4);
+        return ByteBuffer.wrap(float_data).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+    }
+
+    public static byte[] long2ByteArray(long value) {
+        return ByteBuffer.allocate(8).putLong(value).array();
+    }
+
+    public static byte[] float2ByteArray(float value) {
+        return ByteBuffer.allocate(4).putFloat(value).array();
+    }
+    
     //@Override
     //abstract public String toString();
 }

@@ -5,6 +5,10 @@
  */
 package it.officinerobotiche.serial.frame.unav;
 
+import it.officinerobotiche.serial.frame.AbstractFrame;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  *
  * @author Raffaello
@@ -15,6 +19,13 @@ public abstract class AbstVelocity extends UnavFrame {
 
         public Velocity() {
             super();
+        }
+        
+        public Velocity(float lin, float ang) {
+           this.information = Information.REQUEST;
+           this.in = new byte[8];
+           byte[] linbyte = AbstractFrame.float2ByteArray(lin);
+           byte[] angbyte = AbstractFrame.float2ByteArray(ang);
         }
 
         public Velocity(boolean sync, byte[] in) {
@@ -30,7 +41,7 @@ public abstract class AbstVelocity extends UnavFrame {
             return Command.VELOCITY;
         }
     }
-    
+
     public static class VelocityMis extends AbstVelocity {
 
         public VelocityMis() {
@@ -51,16 +62,28 @@ public abstract class AbstVelocity extends UnavFrame {
         }
     }
 
+    private float linear;
+    private float angular;
+
     public AbstVelocity() {
         super();
     }
 
     public AbstVelocity(boolean sync, byte[] in) {
         super(sync, in);
+        this.linear = AbstractFrame.getFloat(in, 0);
+        this.angular = AbstractFrame.getFloat(in, 4);
     }
 
     public AbstVelocity(boolean sync, Information info) {
         super(sync, info);
     }
 
+    public float getLinear() {
+        return linear;
+    }
+
+    public float getAngular() {
+        return angular;
+    }
 }
