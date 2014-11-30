@@ -14,22 +14,24 @@ import java.util.Map;
  * @author Raffaello
  */
 public class Service extends StandardFrame {
-    
+
     private final static int BUFF_SERVICE = 20;
 
     public enum NameService {
 
-        RESET('*'),
-        DATE_CODE('d'),
-        NAME_BOARD('n'),
-        VERSION('v'),
-        AUTHOR('a');
+        RESET('*', "Reset"),
+        DATE_CODE('d', "Date"),
+        NAME_BOARD('n', "Name board"),
+        VERSION('v', "Version"),
+        AUTHOR('a', "Author");
 
         private final char name;
+        private final String name_string;
         private static final Map<Character, NameService> lookup = new HashMap<>();
 
-        private NameService(char name) {
+        private NameService(char name, String name_string) {
             this.name = name;
+            this.name_string = name_string;
         }
 
         public char getName() {
@@ -39,6 +41,11 @@ public class Service extends StandardFrame {
         public byte getByte() {
             return (byte) name;
         }
+        
+        @Override
+        public String toString() {
+            return name_string;
+        }
 
         static {
             for (NameService s : EnumSet.allOf(NameService.class)) {
@@ -46,15 +53,16 @@ public class Service extends StandardFrame {
             }
         }
 
-        public static NameService get(byte Value) {
+        public static NameService get(char Value) {
             //the reverse lookup by simply getting 
             //the value from the lookup HsahMap. 
             return lookup.get(Value);
         }
     };
-    
+
     private String name;
-    
+    private NameService service;
+
     public Service(NameService name) {
         this.information = Information.REQUEST;
         this.in = new byte[BUFF_SERVICE + 1];
@@ -63,41 +71,33 @@ public class Service extends StandardFrame {
 
     public Service(boolean sync, byte[] in) {
         super(sync, in);
-        byte[] data = new byte[BUFF_SERVICE];
-        System.arraycopy(in, 1, data, 0, BUFF_SERVICE);
-        this.name = new String(data);
+        this.service = NameService.get((char) in[0]);
+        this.name = getName(in, 1);
     }
-    
+
+    private String getName(byte[] data, int start) {
+        String name_data = "";
+        for (int i = start; i < data.length; i++) {
+            if (data[i] != (char) '\0') {
+                name_data += (char) data[i];
+            } else {
+                break;
+            }
+        }
+        return name_data;
+    }
+
     public Service(boolean sync, Information info) {
         super(sync, info);
-    }
-    
-    private String decodeService(NameService name_service, String board) {
-        String name = "";
-        switch (name_service) {
-            case AUTHOR:
-                name += NameService.AUTHOR.toString();
-                break;
-            case DATE_CODE:
-                name += NameService.DATE_CODE.toString();
-                break;
-            case NAME_BOARD:
-                name += NameService.NAME_BOARD.toString();
-                break;
-            case VERSION:
-                name += NameService.VERSION.toString();
-                break;
-        }
-        return name + ": " + board;
     }
 
     @Override
     public Command getCommand() {
         return Command.SERVICES;
     }
-    
+
     public String getInformation() {
-        return name;
+        return service.toString() + ": " + name;
     }
 
 }

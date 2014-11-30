@@ -69,28 +69,48 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
-    public <P extends AbstractFrame> void sendASyncMessage(P message) {
+    public <P extends AbstractFrame> void parseSyncFrame(ArrayList<P> message) {
         try {
-            sendMessage(false, message);
+            List<AbstractFrame> sendSyncFrame = sendSyncFrame(message);
+            for (AbstractFrame frame : sendSyncFrame) {
+                fireFrameEvent(new FrameEvent(frame));
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public <P extends AbstractFrame> void sendASyncMessage(ArrayList<P> message) {
+    public <P extends AbstractFrame> void parseSyncFrame(P message) {
         try {
-            sendMessage(false, message);
+            AbstractFrame sendSyncFrame = sendSyncFrame(message);
+            fireFrameEvent(new FrameEvent(sendSyncFrame));
         } catch (InterruptedException ex) {
             Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public <P extends AbstractFrame> P sendSyncMessage(P message) throws InterruptedException {
-        return (P) parsePacket(sendMessage(true, message)).get(0);
+    public <P extends AbstractFrame> void sendASyncFrame(P message) {
+        try {
+            sendFrame(false, message);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public <P extends AbstractFrame> List<AbstractFrame> sendSyncMessage(ArrayList<P> message) throws InterruptedException {
-        return parsePacket(sendMessage(true, message));
+    public <P extends AbstractFrame> void sendASyncFrame(ArrayList<P> message) {
+        try {
+            sendFrame(false, message);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public <P extends AbstractFrame> P sendSyncFrame(P message) throws InterruptedException {
+        return (P) parsePacket(sendFrame(true, message)).get(0);
+    }
+
+    public <P extends AbstractFrame> List<AbstractFrame> sendSyncFrame(ArrayList<P> message) throws InterruptedException {
+        return parsePacket(sendFrame(true, message));
     }
 
     public List<AbstractFrame> parsePacket(Packet packet) {
@@ -112,15 +132,15 @@ public class SerialFrame extends SerialPacket implements PacketListener {
                         if (data[i] > AbstractFrame.LNG_HEADER) {
                             byte[] data_message = new byte[data[i] - AbstractFrame.LNG_HEADER];
                             System.arraycopy(data, i + AbstractFrame.LNG_HEADER, data_message, 0, data[i] - AbstractFrame.LNG_HEADER);
-                            Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(byte[].class);
-                            list_receive.add(declaredConstructor.newInstance(data_message));
+                            Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(boolean.class, byte[].class);
+                            list_receive.add(declaredConstructor.newInstance(packet.isSync(), data_message));
                         }
                         break;
 
                     case ACK:
                     case NACK:
-                        Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(Information.class);
-                        list_receive.add(declaredConstructor.newInstance(get));
+                        Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(boolean.class, Information.class);
+                        list_receive.add(declaredConstructor.newInstance(packet.isSync(), get));
                         break;
                 }
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -156,13 +176,13 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
-    private <P extends AbstractFrame> Packet sendMessage(boolean sync, P message) throws InterruptedException {
+    private <P extends AbstractFrame> Packet sendFrame(boolean sync, P message) throws InterruptedException {
         Packet packet = new Packet(sync);
         packet.addMessage(message.getFrame());
         return super.sendPacket(packet);
     }
 
-    private <P extends AbstractFrame> Packet sendMessage(boolean sync, ArrayList<P> message) throws InterruptedException {
+    private <P extends AbstractFrame> Packet sendFrame(boolean sync, ArrayList<P> message) throws InterruptedException {
         Packet packet = new Packet(sync);
         for (P message_i : message) {
             packet.addMessage(message_i.getFrame());
