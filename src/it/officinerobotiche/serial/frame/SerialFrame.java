@@ -43,6 +43,7 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         super(portName);
         //Load all messages with extension Jmessage 
         allClasses = SerialFrame.getJmessageClasses(SerialFrame.class.getPackage().getName());
+        super.addPacketEventListener(this);
     }
 
     @Override
@@ -52,19 +53,19 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
-    public void addFrameEventListener(PacketListener listener) {
-        listenerList.add(PacketListener.class, listener);
+    public void addParserEventListener(ParserListener listener) {
+        listenerList.add(ParserListener.class, listener);
     }
 
-    public void removeFrameEventListener(PacketListener listener) {
-        listenerList.remove(PacketListener.class, listener);
+    public void removeParserEventListener(ParserListener listener) {
+        listenerList.remove(ParserListener.class, listener);
     }
 
     private void fireFrameEvent(FrameEvent evt) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = 0; i < listeners.length; i = i + 2) {
             if (listeners[i] == ParserListener.class) {
-                ((ParserListener) listeners[i + 1]).frameEvent(evt);
+                ((ParserListener) listeners[i + 1]).parserEvent(evt);
             }
         }
     }
