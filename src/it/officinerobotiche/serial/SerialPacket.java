@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2014 Officine Robotiche.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
 package it.officinerobotiche.serial;
 
@@ -21,25 +32,24 @@ import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 
 /**
- *
- * @author Raffaello
+ * Object to send and receive a Packet object from serial port with O-RB protocol.
+ * @author Raffaello Bonghi
  */
 public class SerialPacket implements SerialPortEventListener {
-
     /**
-     * Serial port object to communicate with board
+     * Serial port object to communicate with board.
      */
     private SerialPort serialPort;
     /**
-     * Header for syncronus packet
+     * Header for syncronus packet.
      */
     private static final byte HEADER_SYNC = (byte) '#';
     /**
-     * Header for asyncronus packet
+     * Header for asyncronus packet.
      */
     private static final byte HEADER_ASYNC = (byte) '@';
     /**
-     * Dimension of header
+     * Dimension of header.
      */
     private final static int LNG_HEADER = 2;
     /**
@@ -51,11 +61,11 @@ public class SerialPacket implements SerialPortEventListener {
      */
     private static final int DATA_RATE = 115200;
     /**
-     * Stream to receive packet in serial
+     * Stream to receive packet in serial.
      */
     private InputStream in;
     /**
-     * Stream to send packet in serial
+     * Stream to send packet in serial.
      */
     private OutputStream out;
     /**
@@ -64,12 +74,16 @@ public class SerialPacket implements SerialPortEventListener {
      */
     private int statusDec = 0;
     /**
-     * Packet to decode
+     * Packet to decode.
      */
     private Packet packet;
-
+    /**
+     * Token to block methods for syncronus packet serial request.
+     */
     private Barrier block = new Barrier();
-
+    /**
+     * List with all asyncronus listener.
+     */
     protected EventListenerList listenerList = new EventListenerList();
 
     public SerialPacket(String portName) {
@@ -147,7 +161,7 @@ public class SerialPacket implements SerialPortEventListener {
                         if (packet.isSync()) {
                             block.release();
                         } else {
-                            firePacketEvent(new PacketEvent(packet));
+                            firePacketEvent(packet);
                         }
                     }
                 }
@@ -217,11 +231,11 @@ public class SerialPacket implements SerialPortEventListener {
         listenerList.remove(PacketListener.class, listener);
     }
 
-    private void firePacketEvent(PacketEvent evt) {
+    private void firePacketEvent(Packet packet) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = 0; i < listeners.length; i = i + 2) {
             if (listeners[i] == PacketListener.class) {
-                ((PacketListener) listeners[i + 1]).asyncPacketEvent(evt);
+                ((PacketListener) listeners[i + 1]).asyncPacketEvent(packet);
             }
         }
     }

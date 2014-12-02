@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2014 Officine Robotiche.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
 package it.officinerobotiche.serial.frame;
 
@@ -47,9 +58,9 @@ public class SerialFrame extends SerialPacket implements PacketListener {
     }
 
     @Override
-    public void asyncPacketEvent(PacketEvent evt) {
-        for (AbstractFrame frame : parsePacket(evt.getPacket())) {
-            fireFrameEvent(new FrameEvent(frame));
+    public void asyncPacketEvent(Packet packet) {
+        for (AbstractFrame frame : parsePacket(packet)) {
+            fireFrameEvent(frame);
         }
     }
 
@@ -61,11 +72,11 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         listenerList.remove(ParserListener.class, listener);
     }
 
-    private void fireFrameEvent(FrameEvent evt) {
+    private void fireFrameEvent(AbstractFrame frame) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = 0; i < listeners.length; i = i + 2) {
             if (listeners[i] == ParserListener.class) {
-                ((ParserListener) listeners[i + 1]).parserEvent(evt);
+                ((ParserListener) listeners[i + 1]).parserEvent(frame);
             }
         }
     }
@@ -74,7 +85,7 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         try {
             List<AbstractFrame> sendSyncFrame = sendSyncFrame(message);
             for (AbstractFrame frame : sendSyncFrame) {
-                fireFrameEvent(new FrameEvent(frame));
+                fireFrameEvent(frame);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,7 +95,7 @@ public class SerialFrame extends SerialPacket implements PacketListener {
     public <P extends AbstractFrame> void parseSyncFrame(P message) {
         try {
             AbstractFrame sendSyncFrame = sendSyncFrame(message);
-            fireFrameEvent(new FrameEvent(sendSyncFrame));
+            fireFrameEvent(sendSyncFrame);
         } catch (InterruptedException ex) {
             Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

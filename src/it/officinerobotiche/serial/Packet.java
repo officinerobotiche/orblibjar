@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2014 Officine Robotiche.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
 package it.officinerobotiche.serial;
 
@@ -22,7 +33,7 @@ public class Packet {
     /**
      * Dateformat to time
      */
-    protected DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
+    protected final DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
     /**
      * Type of packet, syncronous or asyncronous
      */
@@ -30,7 +41,7 @@ public class Packet {
     /**
      * Data bytes to decode
      */
-    private ArrayList<Byte> dataStructure;
+    private final ArrayList<Byte> dataStructure;
     /**
      * Dimension of packet
      */
@@ -48,7 +59,7 @@ public class Packet {
     public Packet(boolean sync, long currentTimeMillis) {
         this.sync = sync;
         this.timestamp = currentTimeMillis;
-        dataStructure = new ArrayList<Byte>();
+        dataStructure = new ArrayList<>();
     }
     
     /**
@@ -58,7 +69,7 @@ public class Packet {
     public Packet(boolean sync) {
         this.sync = sync;
         this.timestamp = System.currentTimeMillis();
-        dataStructure = new ArrayList<Byte>();
+        dataStructure = new ArrayList<>();
     }
     
     /**
@@ -136,12 +147,20 @@ public class Packet {
         return data;
     }
 
+    /**
+     * Information about object packet.
+     * @return string with all data information.
+     */
     @Override
     public String toString() {
+        String data = "";
+        for(byte i : dataStructure) {
+            data += (char) i;
+        }
         return "Packet{" + 
                 "Time Stamp=" + df.format(new Date(timestamp)) + ", " + 
                 "sync=" + sync + ", " + 
-                "DataStructure=" + dataStructure.toString() + ", " + 
+                "DataStructure=[" + data + "], " + 
                 "length=" + dataStructure.size() + '}';
     }
     
