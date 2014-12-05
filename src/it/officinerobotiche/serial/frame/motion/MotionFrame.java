@@ -14,7 +14,7 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 import it.officinerobotiche.serial.frame.AbstractFrame;
 import java.util.EnumSet;
@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Raffaello Bonghi
  */
-public abstract class UnavFrame extends AbstractFrame {
+public abstract class MotionFrame extends AbstractFrame {
 
     public enum Command implements ICommand {
 
@@ -77,15 +77,15 @@ public abstract class UnavFrame extends AbstractFrame {
         }
     };
 
-    public UnavFrame() {
+    public MotionFrame() {
         super();
     }
 
-    public UnavFrame(boolean sync, byte[] in) {
+    public MotionFrame(boolean sync, byte[] in) {
         super(sync, in);
     }
 
-    public UnavFrame(boolean sync, Information info) {
+    public MotionFrame(boolean sync, Information info) {
         super(sync, info);
     }
 

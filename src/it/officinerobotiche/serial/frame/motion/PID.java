@@ -14,63 +14,66 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 /**
  *
  * @author Raffaello Bonghi
  */
-public abstract class Motor extends UnavFrame {
-
-    public static class MotorLeft extends UnavFrame {
-
-        public MotorLeft() {
-            super();
-        }
-
-        public MotorLeft(boolean sync, byte[] in) {
-            super(sync, in);
-        }
-
-        public MotorLeft(boolean sync, Information info) {
-            super(sync, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.MOTOR_L;
-        }
-    }
+public abstract class PID extends MotionFrame {
     
-    public static class MotorRight extends UnavFrame {
-
-        public MotorRight() {
-            super();
-        }
-
-        public MotorRight(boolean sync, byte[] in) {
-            super(sync, in);
-        }
-
-        public MotorRight(boolean sync, Information info) {
-            super(sync, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.MOTOR_R;
-        }
-    }
-
-    public Motor() {
+    public PID() {
         super();
     }
 
-    public Motor(boolean sync, byte[] in) {
+    public PID(boolean sync, byte[] in) {
         super(sync, in);
     }
-
-    public Motor(boolean sync, Information info) {
+    
+    public PID(boolean sync, Information info) {
         super(sync, info);
     }
+
+    public static class PIDLeft extends PID {
+        
+        public PIDLeft() {
+            super();
+        }
+
+        public PIDLeft(boolean sync, byte[] in) {
+            super(sync, in);
+        }
+        
+        public PIDLeft(boolean sync, Information info) {
+            super(sync, info);
+        }
+
+        @Override
+        public Command getCommand() {
+            return Command.PID_L;
+        }
+
+    }
+    
+    public static class PIDRight extends PID {
+        
+        public PIDRight() {
+            super();
+        }
+
+        public PIDRight(boolean sync, byte[] in) {
+            super(sync, in);
+        }
+        
+        public PIDRight(boolean sync, Information info) {
+            super(sync, info);
+        }
+
+        @Override
+        public Command getCommand() {
+            return Command.PID_R;
+        }
+
+    }
+
 }

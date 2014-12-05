@@ -148,7 +148,7 @@ public class SerialPacket implements SerialPortEventListener {
      * @param oEvent type of event received from serial
      */
     @Override
-    public synchronized void serialEvent(SerialPortEvent oEvent) {
+    public void serialEvent(SerialPortEvent oEvent) {
         if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
             try {
                 int data;
@@ -175,7 +175,7 @@ public class SerialPacket implements SerialPortEventListener {
      * This should be called when you stop using the port. This will prevent
      * port locking on platforms like Linux.
      */
-    public synchronized void close() {
+    public void close() {
         if (serialPort != null) {
             serialPort.removeEventListener();
             serialPort.close();

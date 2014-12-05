@@ -14,29 +14,29 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 /**
  *
  * @author Raffaello Bonghi
  */
-public class Coordinate extends UnavFrame {
+public class DeltaOdo extends MotionFrame {
     
-    public Coordinate() {
+    public DeltaOdo() {
         super();
     }
 
-    public Coordinate(boolean sync, byte[] in) {
+    public DeltaOdo(boolean sync, byte[] in) {
         super(sync, in);
     }
     
-    public Coordinate(boolean sync, Information info) {
+    public DeltaOdo(boolean sync, Information info) {
         super(sync, info);
     }
     
     @Override
     public Command getCommand() {
-        return Command.COORDINATE;
+        return Command.DELTA_ODO;
     }
     
 }

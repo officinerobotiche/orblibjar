@@ -14,29 +14,29 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 /**
  *
  * @author Raffaello Bonghi
  */
-public class Constraint extends UnavFrame {
+public class ParamMotors extends MotionFrame {
     
-    public Constraint() {
+    public ParamMotors() {
         super();
     }
-
-    public Constraint(boolean sync, byte[] in) {
+    
+    public ParamMotors(boolean sync, byte[] in) {
         super(sync, in);
     }
     
-    public Constraint(boolean sync, Information info) {
+    public ParamMotors(boolean sync, Information info) {
         super(sync, info);
     }
     
     @Override
     public Command getCommand() {
-        return Command.CONSTRAINT;
+        return Command.PARAM_MOTORS;
     }
     
 }

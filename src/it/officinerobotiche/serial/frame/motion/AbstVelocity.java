@@ -14,7 +14,7 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 import it.officinerobotiche.serial.frame.AbstractFrame;
 
@@ -22,7 +22,7 @@ import it.officinerobotiche.serial.frame.AbstractFrame;
  *
  * @author Raffaello Bonghi
  */
-public abstract class AbstVelocity extends UnavFrame {
+public abstract class AbstVelocity extends MotionFrame {
 
     public static class Velocity extends AbstVelocity {
 

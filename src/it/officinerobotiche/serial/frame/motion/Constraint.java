@@ -14,29 +14,29 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 /**
  *
  * @author Raffaello Bonghi
  */
-public class DeltaOdo extends UnavFrame {
+public class Constraint extends MotionFrame {
     
-    public DeltaOdo() {
+    public Constraint() {
         super();
     }
 
-    public DeltaOdo(boolean sync, byte[] in) {
+    public Constraint(boolean sync, byte[] in) {
         super(sync, in);
     }
     
-    public DeltaOdo(boolean sync, Information info) {
+    public Constraint(boolean sync, Information info) {
         super(sync, info);
     }
     
     @Override
     public Command getCommand() {
-        return Command.DELTA_ODO;
+        return Command.CONSTRAINT;
     }
     
 }

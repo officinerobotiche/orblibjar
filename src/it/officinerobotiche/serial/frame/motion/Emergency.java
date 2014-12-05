@@ -14,29 +14,29 @@
  * Contributors:
  *     Raffaello Bonghi - raffaello.bonghi@officinerobotiche.it
  */
-package it.officinerobotiche.serial.frame.unav;
+package it.officinerobotiche.serial.frame.motion;
 
 /**
  *
  * @author Raffaello Bonghi
  */
-public class Enable extends UnavFrame {
+public class Emergency extends MotionFrame {
     
-    public Enable() {
+    public Emergency() {
         super();
     }
 
-    public Enable(boolean sync, byte[] in) {
+    public Emergency(boolean sync, byte[] in) {
         super(sync, in);
     }
     
-    public Enable(boolean sync, Information info) {
+    public Emergency(boolean sync, Information info) {
         super(sync, info);
     }
     
     @Override
     public Command getCommand() {
-        return Command.ENABLE;
+        return Command.EMERGENCY;
     }
     
 }
