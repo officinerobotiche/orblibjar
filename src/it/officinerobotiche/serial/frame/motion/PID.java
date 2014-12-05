@@ -38,7 +38,7 @@ public class PID extends MotionFrame {
         
     };
     
-    private Type comm;
+    private final Type comm;
 
     public PID(Type comm) {
         super();

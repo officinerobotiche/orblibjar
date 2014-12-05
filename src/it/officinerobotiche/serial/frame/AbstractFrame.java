@@ -33,7 +33,7 @@ public abstract class AbstractFrame implements Jmessage {
 
     public static enum TypeMessage {
 
-        DEFAULT('D', "Standard"), UNAV('M', "Motion");
+        DEFAULT('D', "Standard"), MOTION('M', "Motion");
 
         private static final String NAME_PKG = TypeMessage.class.getPackage().getName();
         private static final String NAME_FRAME = "Frame";

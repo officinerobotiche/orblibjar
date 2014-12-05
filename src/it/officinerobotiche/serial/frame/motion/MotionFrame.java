@@ -91,7 +91,7 @@ public abstract class MotionFrame extends AbstractFrame {
     
     @Override
     public TypeMessage getTypeMessage() {
-        return TypeMessage.UNAV;
+        return TypeMessage.MOTION;
     }
 
     @Override
