@@ -28,7 +28,7 @@ public class Service extends StandardFrame {
 
     private final static int BUFF_SERVICE = 20;
 
-    public enum NameService {
+    private enum NameService {
 
         RESET('*', "Reset"),
         DATE_CODE('d', "Date"),
@@ -70,11 +70,17 @@ public class Service extends StandardFrame {
             return lookup.get(Value);
         }
     };
+    
+    public static final Service AUTHOR = new Service(NameService.AUTHOR);
+    public static final Service DATE_CODE = new Service(NameService.DATE_CODE);
+    public static final Service NAME_BOARD = new Service(NameService.NAME_BOARD);
+    public static final Service RESET = new Service(NameService.RESET);
+    public static final Service VERSION = new Service(NameService.VERSION);
 
     private String name;
     private NameService service;
 
-    public Service(NameService name) {
+    private Service(NameService name) {
         this.information = Information.REQUEST;
         this.in = new byte[BUFF_SERVICE + 1];
         this.in[0] = name.getByte();

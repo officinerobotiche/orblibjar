@@ -22,9 +22,13 @@ package it.officinerobotiche.serial.frame.standard;
  */
 public abstract class MProcess extends StandardFrame {
 
+    public static final MProcess FREQUENCY = new MProcess.Frequency();
+    public static final MProcess PRIORITY = new MProcess.Priority();
+    public static final MProcess TIME = new MProcess.Time();
+
     public static class Time extends MProcess {
 
-        public Time() {
+        private Time() {
             super();
         }
 
@@ -52,7 +56,7 @@ public abstract class MProcess extends StandardFrame {
 
     public static class Priority extends MProcess {
 
-        public Priority() {
+        private Priority() {
             super();
         }
 
@@ -77,7 +81,7 @@ public abstract class MProcess extends StandardFrame {
 
     public static class Frequency extends MProcess {
 
-        public Frequency() {
+        private Frequency() {
             super();
         }
 
@@ -99,7 +103,7 @@ public abstract class MProcess extends StandardFrame {
     protected int parse_packet;
     private int[] processes;
 
-    public MProcess() {
+    private MProcess() {
         super();
     }
 

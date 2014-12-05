@@ -21,8 +21,7 @@ package it.officinerobotiche.serial.frame.motion;
  * @author Raffaello Bonghi
  */
 public class PID extends MotionFrame {
-
-    public enum Type {
+    private enum Type {
 
         PID_LEFT(Command.PID_L), PID_RIGHT(Command.PID_R);
 
@@ -38,9 +37,12 @@ public class PID extends MotionFrame {
         
     };
     
+    public static final PID LEFT = new PID(Type.PID_LEFT);
+    public static final PID RIGHT = new PID(Type.PID_RIGHT);
+    
     private final Type comm;
 
-    public PID(Type comm) {
+    private PID(Type comm) {
         super();
         this.comm = comm;
     }
