@@ -20,60 +20,43 @@ package it.officinerobotiche.serial.frame.motion;
  *
  * @author Raffaello Bonghi
  */
-public abstract class PID extends MotionFrame {
+public class PID extends MotionFrame {
+
+    public enum Type {
+
+        PID_LEFT(Command.PID_L), PID_RIGHT(Command.PID_R);
+
+        private final Command command;
+
+        private Type(Command command) {
+            this.command = command;
+        }
+
+        public Command getCommand() {
+            return command;
+        }
+        
+    };
     
-    public PID() {
+    private Type comm;
+
+    public PID(Type comm) {
         super();
+        this.comm = comm;
     }
 
     public PID(boolean sync, int command, byte[] in) {
         super(sync, command, in);
+        this.comm = (command == Command.PID_L.getByte()) ? Type.PID_LEFT : Type.PID_RIGHT;
     }
-    
+
     public PID(boolean sync, int command, Information info) {
         super(sync, command, info);
+        this.comm = (command == Command.PID_L.getByte()) ? Type.PID_LEFT : Type.PID_RIGHT;
     }
 
-    public static class PIDLeft extends PID {
-        
-        public PIDLeft() {
-            super();
-        }
-
-        public PIDLeft(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-        
-        public PIDLeft(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.PID_L;
-        }
-
+    @Override
+    public Command getCommand() {
+        return comm.getCommand();
     }
-    
-    public static class PIDRight extends PID {
-        
-        public PIDRight() {
-            super();
-        }
-
-        public PIDRight(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-        
-        public PIDRight(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.PID_R;
-        }
-
-    }
-
 }
