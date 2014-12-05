@@ -26,12 +26,12 @@ public abstract class PID extends MotionFrame {
         super();
     }
 
-    public PID(boolean sync, byte[] in) {
-        super(sync, in);
+    public PID(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
     
-    public PID(boolean sync, Information info) {
-        super(sync, info);
+    public PID(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 
     public static class PIDLeft extends PID {
@@ -40,12 +40,12 @@ public abstract class PID extends MotionFrame {
             super();
         }
 
-        public PIDLeft(boolean sync, byte[] in) {
-            super(sync, in);
+        public PIDLeft(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
         
-        public PIDLeft(boolean sync, Information info) {
-            super(sync, info);
+        public PIDLeft(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         @Override
@@ -61,12 +61,12 @@ public abstract class PID extends MotionFrame {
             super();
         }
 
-        public PIDRight(boolean sync, byte[] in) {
-            super(sync, in);
+        public PIDRight(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
         
-        public PIDRight(boolean sync, Information info) {
-            super(sync, info);
+        public PIDRight(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         @Override

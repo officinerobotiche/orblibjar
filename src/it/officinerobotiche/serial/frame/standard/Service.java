@@ -80,8 +80,8 @@ public class Service extends StandardFrame {
         this.in[0] = name.getByte();
     }
 
-    public Service(boolean sync, byte[] in) {
-        super(sync, in);
+    public Service(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
         this.service = NameService.get((char) in[0]);
         this.name = getName(in, 1);
     }
@@ -98,8 +98,8 @@ public class Service extends StandardFrame {
         return name_data;
     }
 
-    public Service(boolean sync, Information info) {
-        super(sync, info);
+    public Service(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 
     @Override

@@ -37,12 +37,12 @@ public abstract class AbstVelocity extends MotionFrame {
            byte[] angbyte = AbstractFrame.float2ByteArray(ang);
         }
 
-        public Velocity(boolean sync, byte[] in) {
-            super(sync, in);
+        public Velocity(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public Velocity(boolean sync, Information info) {
-            super(sync, info);
+        public Velocity(boolean sync, int command,  Information info) {
+            super(sync, command, info);
         }
 
         @Override
@@ -57,12 +57,12 @@ public abstract class AbstVelocity extends MotionFrame {
             super();
         }
 
-        public VelocityMis(boolean sync, byte[] in) {
-            super(sync, in);
+        public VelocityMis(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public VelocityMis(boolean sync, Information info) {
-            super(sync, info);
+        public VelocityMis(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         @Override
@@ -78,14 +78,14 @@ public abstract class AbstVelocity extends MotionFrame {
         super();
     }
 
-    public AbstVelocity(boolean sync, byte[] in) {
-        super(sync, in);
+    public AbstVelocity(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
         this.linear = AbstractFrame.getFloat(in, 0);
         this.angular = AbstractFrame.getFloat(in, 4);
     }
 
-    public AbstVelocity(boolean sync, Information info) {
-        super(sync, info);
+    public AbstVelocity(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 
     public float getLinear() {

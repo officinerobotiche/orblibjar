@@ -26,12 +26,12 @@ public class Constraint extends MotionFrame {
         super();
     }
 
-    public Constraint(boolean sync, byte[] in) {
-        super(sync, in);
+    public Constraint(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
     
-    public Constraint(boolean sync, Information info) {
-        super(sync, info);
+    public Constraint(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
     
     @Override

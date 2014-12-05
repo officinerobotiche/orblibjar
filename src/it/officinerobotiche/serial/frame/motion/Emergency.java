@@ -26,12 +26,12 @@ public class Emergency extends MotionFrame {
         super();
     }
 
-    public Emergency(boolean sync, byte[] in) {
-        super(sync, in);
+    public Emergency(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
     
-    public Emergency(boolean sync, Information info) {
-        super(sync, info);
+    public Emergency(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
     
     @Override

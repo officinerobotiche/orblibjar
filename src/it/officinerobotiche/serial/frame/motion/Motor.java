@@ -28,12 +28,12 @@ public abstract class Motor extends MotionFrame {
             super();
         }
 
-        public MotorLeft(boolean sync, byte[] in) {
-            super(sync, in);
+        public MotorLeft(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public MotorLeft(boolean sync, Information info) {
-            super(sync, info);
+        public MotorLeft(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         @Override
@@ -48,12 +48,12 @@ public abstract class Motor extends MotionFrame {
             super();
         }
 
-        public MotorRight(boolean sync, byte[] in) {
-            super(sync, in);
+        public MotorRight(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public MotorRight(boolean sync, Information info) {
-            super(sync, info);
+        public MotorRight(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         @Override
@@ -66,11 +66,11 @@ public abstract class Motor extends MotionFrame {
         super();
     }
 
-    public Motor(boolean sync, byte[] in) {
-        super(sync, in);
+    public Motor(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
 
-    public Motor(boolean sync, Information info) {
-        super(sync, info);
+    public Motor(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 }

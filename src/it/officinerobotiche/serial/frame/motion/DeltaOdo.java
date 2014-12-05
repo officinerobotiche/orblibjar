@@ -26,12 +26,12 @@ public class DeltaOdo extends MotionFrame {
         super();
     }
 
-    public DeltaOdo(boolean sync, byte[] in) {
-        super(sync, in);
+    public DeltaOdo(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
     
-    public DeltaOdo(boolean sync, Information info) {
-        super(sync, info);
+    public DeltaOdo(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
     
     @Override

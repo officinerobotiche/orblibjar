@@ -81,14 +81,14 @@ public abstract class MotionFrame extends AbstractFrame {
         super();
     }
 
-    public MotionFrame(boolean sync, byte[] in) {
-        super(sync, in);
+    public MotionFrame(boolean sync, int name, byte[] in) {
+        super(sync, name, in);
     }
 
-    public MotionFrame(boolean sync, Information info) {
-        super(sync, info);
+    public MotionFrame(boolean sync, int name, Information info) {
+        super(sync, name, info);
     }
-
+    
     @Override
     public TypeMessage getTypeMessage() {
         return TypeMessage.UNAV;

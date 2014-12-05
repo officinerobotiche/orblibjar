@@ -46,12 +46,12 @@ public class ErrorSerial extends StandardFrame {
         super();
     }
 
-    public ErrorSerial(boolean sync, byte[] in) {
-        super(sync, in);
+    public ErrorSerial(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
 
-    public ErrorSerial(boolean sync, Information info) {
-        super(sync, info);
+    public ErrorSerial(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 
     @Override

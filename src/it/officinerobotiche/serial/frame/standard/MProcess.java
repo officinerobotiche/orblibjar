@@ -28,12 +28,12 @@ public abstract class MProcess extends StandardFrame {
             super();
         }
 
-        public Time(boolean sync, byte[] in) {
-            super(sync, in);
+        public Time(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public Time(boolean sync, Information info) {
-            super(sync, info);
+        public Time(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         public int getIdle() {
@@ -56,12 +56,12 @@ public abstract class MProcess extends StandardFrame {
             super();
         }
 
-        public Priority(boolean sync, byte[] in) {
-            super(sync, in);
+        public Priority(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public Priority(boolean sync, Information info) {
-            super(sync, info);
+        public Priority(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         public int getParse_packet() {
@@ -81,12 +81,12 @@ public abstract class MProcess extends StandardFrame {
             super();
         }
 
-        public Frequency(boolean sync, byte[] in) {
-            super(sync, in);
+        public Frequency(boolean sync, int command, byte[] in) {
+            super(sync, command, in);
         }
 
-        public Frequency(boolean sync, Information info) {
-            super(sync, info);
+        public Frequency(boolean sync, int command, Information info) {
+            super(sync, command, info);
         }
 
         @Override
@@ -103,8 +103,8 @@ public abstract class MProcess extends StandardFrame {
         super();
     }
 
-    public MProcess(boolean sync, byte[] in) {
-        super(sync, in);
+    public MProcess(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
         processes = new int[in[0]];
         idle = in[1];
         parse_packet = in[2];
@@ -113,8 +113,8 @@ public abstract class MProcess extends StandardFrame {
         }
     }
 
-    public MProcess(boolean sync, Information info) {
-        super(sync, info);
+    public MProcess(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 
     public int[] getProcesses() {

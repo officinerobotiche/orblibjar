@@ -88,18 +88,18 @@ public abstract class AbstractFrame implements Jmessage {
         this.information = Information.REQUEST;
     }
 
-    public AbstractFrame(boolean sync, Information info) {
+    public AbstractFrame(boolean sync, int name, Information info) {
         this.sync = sync;
         this.in = null;
         this.information = info;
     }
 
-    public AbstractFrame(boolean sync, byte[] in) {
+    public AbstractFrame(boolean sync, int name, byte[] in) {
         this.sync = sync;
         this.in = in;
         this.information = Information.DATA;
     }
-
+    
     abstract public TypeMessage getTypeMessage();
 
     @Override
@@ -138,7 +138,7 @@ public abstract class AbstractFrame implements Jmessage {
     public static byte[] float2ByteArray(float value) {
         return ByteBuffer.allocate(4).putFloat(value).array();
     }
-    
+
     //@Override
     //abstract public String toString();
 }

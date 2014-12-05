@@ -26,12 +26,12 @@ public class Coordinate extends MotionFrame {
         super();
     }
 
-    public Coordinate(boolean sync, byte[] in) {
-        super(sync, in);
+    public Coordinate(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
     
-    public Coordinate(boolean sync, Information info) {
-        super(sync, info);
+    public Coordinate(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
     
     @Override

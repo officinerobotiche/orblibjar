@@ -26,12 +26,12 @@ public class NameProcess extends StandardFrame {
         super();
     }
 
-    public NameProcess(boolean sync, byte[] in) {
-        super(sync, in);
+    public NameProcess(boolean sync, int command, byte[] in) {
+        super(sync, command, in);
     }
     
-    public NameProcess(boolean sync, Information info) {
-        super(sync, info);
+    public NameProcess(boolean sync, int command, Information info) {
+        super(sync, command, info);
     }
 
     @Override

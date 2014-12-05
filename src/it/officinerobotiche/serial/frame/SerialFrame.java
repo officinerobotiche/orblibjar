@@ -144,15 +144,15 @@ public class SerialFrame extends SerialPacket implements PacketListener {
                         if (data[i] > AbstractFrame.LNG_HEADER) {
                             byte[] data_message = new byte[data[i] - AbstractFrame.LNG_HEADER];
                             System.arraycopy(data, i + AbstractFrame.LNG_HEADER, data_message, 0, data[i] - AbstractFrame.LNG_HEADER);
-                            Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(boolean.class, byte[].class);
-                            list_receive.add(declaredConstructor.newInstance(packet.isSync(), data_message));
+                            Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(boolean.class, int.class, byte[].class);
+                            list_receive.add(declaredConstructor.newInstance(packet.isSync(), command, data_message));
                         }
                         break;
 
                     case ACK:
                     case NACK:
-                        Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(boolean.class, Information.class);
-                        list_receive.add(declaredConstructor.newInstance(packet.isSync(), get));
+                        Constructor<? extends AbstractFrame> declaredConstructor = message.getDeclaredConstructor(boolean.class, int.class, Information.class);
+                        list_receive.add(declaredConstructor.newInstance(packet.isSync(), command, get));
                         break;
                 }
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
