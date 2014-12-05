@@ -20,57 +20,30 @@ package it.officinerobotiche.serial.frame.motion;
  *
  * @author Raffaello Bonghi
  */
-public abstract class Motor extends MotionFrame {
-
-    public static class MotorLeft extends MotionFrame {
-
-        public MotorLeft() {
-            super();
-        }
-
-        public MotorLeft(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-
-        public MotorLeft(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.MOTOR_L;
-        }
-    }
+public class Motor extends MotionFrame {
     
-    public static class MotorRight extends MotionFrame {
+    public static final Motor LEFT = new Motor(Command.MOTOR_L);
+    public static final Motor RIGHT = new Motor(Command.MOTOR_R);
+    
+    private final Command comm;
 
-        public MotorRight() {
-            super();
-        }
-
-        public MotorRight(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-
-        public MotorRight(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.MOTOR_R;
-        }
-    }
-
-    public Motor() {
+    private Motor(Command comm) {
         super();
+        this.comm = comm;
     }
 
     public Motor(boolean sync, int command, byte[] in) {
         super(sync, command, in);
+        this.comm = Command.getCommand(command);
     }
 
     public Motor(boolean sync, int command, Information info) {
         super(sync, command, info);
+        this.comm = Command.getCommand(command);
+    }
+    
+    @Override
+    public Command getCommand() {
+        return comm;
     }
 }

@@ -16,38 +16,78 @@
  */
 package it.officinerobotiche.serial.frame.standard;
 
+import it.officinerobotiche.serial.frame.AbstractFrame;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Raffaello Bonghi
  */
 public class ErrorSerial extends StandardFrame {
+    
+    public static final ErrorSerial ERROR_SERIAL = new ErrorSerial();
 
     private enum ERROR {
 
-        ERROR_FRAMMING(-1),
-        ERROR_OVERRUN(-2),
-        ERROR_HEADER(-3),
-        ERROR_LENGTH(-4),
-        ERROR_DATA(-5),
-        ERROR_CKS(-6),
-        ERROR_CMD(-7),
-        ERROR_NACK(-8),
-        ERROR_OPTION(-9),
-        ERROR_PKG(-10),
-        ERROR_CREATE_PKG(-11);
-        private final int error;
+        FRAMMING(-1, "Framming"),
+        OVERRUN(-2, "Overrun"),
+        HEADER(-3, "Header"),
+        LENGTH(-4, "Length"),
+        DATA(-5, "Data"),
+        CKS(-6, "CheckSum"),
+        CMD(-7, "Command"),
+        NACK(-8, "NACK"),
+        OPTION(-9, "Option"),
+        PKG(-10, "Package"),
+        CREATE_PKG(-11, "Create package");
 
-        private ERROR(int error) {
+        private final int error;
+        private final String name;
+        private static final Map<Integer, ERROR> lookup = new HashMap<>();
+
+        private ERROR(int error, String name) {
             this.error = error;
+            this.name = name;
+        }
+
+        static {
+            for (ERROR s : EnumSet.allOf(ERROR.class)) {
+                lookup.put(s.getError(), s);
+            }
+        }
+
+        public int getError() {
+            return error;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static ERROR get(int Value) {
+            //the reverse lookup by simply getting 
+            //the value from the lookup HsahMap. 
+            return lookup.get(Value);
         }
     };
+    
+    private static final Map<Integer, String> lookup = new HashMap<>();
 
-    public ErrorSerial() {
+    private ErrorSerial() {
         super();
     }
 
     public ErrorSerial(boolean sync, int command, byte[] in) {
         super(sync, command, in);
+        for(int i=0; i < in.length; i += 2) {
+            lookup.put(AbstractFrame.byteArrayToInt(in, i), ERROR.get(-i/2).getName());
+        }
+    }
+
+    public static Map<Integer, String> getLookup() {
+        return lookup;
     }
 
     public ErrorSerial(boolean sync, int command, Information info) {

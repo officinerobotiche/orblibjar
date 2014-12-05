@@ -30,9 +30,9 @@ public abstract class StandardFrame extends AbstractFrame {
     public enum Command implements ICommand {
 
         SERVICES(0, "Service"),
-        TIME_PROCESS(1, "Time"),
-        PRIORITY_PROCESS(2, "Priority"),
-        FRQ_PROCESS(3, "Frequency"),
+        TIME_PROCESS(1, "MProcess"),
+        PRIORITY_PROCESS(2, "MProcess"),
+        FRQ_PROCESS(3, "MProcess"),
         PARAMETER_SYSTEM(4, "ParamSystem"),
         ERROR_SERIAL(5, "ErrorSerial"),
         NAME_PROCESS(6, "NameProcess");
@@ -40,6 +40,7 @@ public abstract class StandardFrame extends AbstractFrame {
         private final int number;
         private final String name;
         private static final Map<Integer, String> lookup = new HashMap<>();
+        private static final Map<Integer, Command> look_comm = new HashMap<>();
 
         private Command(int number, String name) {
             this.number = number;
@@ -50,7 +51,7 @@ public abstract class StandardFrame extends AbstractFrame {
         public int getNumber() {
             return number;
         }
-        
+
         @Override
         public byte getByte() {
             return (byte) number;
@@ -64,10 +65,15 @@ public abstract class StandardFrame extends AbstractFrame {
         static {
             for (Command s : EnumSet.allOf(Command.class)) {
                 lookup.put(s.getNumber(), s.getName());
+                look_comm.put(s.getNumber(), s);
             }
         }
 
-        public static String getCommand(int number) {
+        public static Command getCommand(int number) {
+            return look_comm.get(number);
+        }
+
+        public static String getStringCommand(int number) {
             return lookup.get(number);
         }
     };
@@ -79,7 +85,7 @@ public abstract class StandardFrame extends AbstractFrame {
     public StandardFrame(boolean sync, int name, byte[] in) {
         super(sync, name, in);
     }
-    
+
     public StandardFrame(boolean sync, int name, Information info) {
         super(sync, name, info);
     }

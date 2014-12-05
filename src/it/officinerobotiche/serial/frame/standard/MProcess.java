@@ -16,113 +16,73 @@
  */
 package it.officinerobotiche.serial.frame.standard;
 
+import it.officinerobotiche.serial.frame.AbstractFrame;
+
 /**
  *
  * @author Raffaello Bonghi
  */
-public abstract class MProcess extends StandardFrame {
+public class MProcess extends StandardFrame {
 
-    public static final MProcess FREQUENCY = new MProcess.Frequency();
-    public static final MProcess PRIORITY = new MProcess.Priority();
-    public static final MProcess TIME = new MProcess.Time();
-
-    public static class Time extends MProcess {
-
-        private Time() {
-            super();
-        }
-
-        public Time(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-
-        public Time(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        public int getIdle() {
-            return idle;
-        }
-
-        public int getParse_packet() {
-            return parse_packet;
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.TIME_PROCESS;
-        }
-    }
+    public static final MProcess.Frequency FREQUENCY = new MProcess.Frequency();
+    public static final MProcess.Priority PRIORITY = new MProcess.Priority();
+    public static final MProcess TIME = new MProcess(Command.TIME_PROCESS);
 
     public static class Priority extends MProcess {
 
-        private Priority() {
-            super();
+        public Priority() {
+            super(Command.PRIORITY_PROCESS);
         }
-
-        public Priority(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-
-        public Priority(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        public int getParse_packet() {
-            return parse_packet;
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.PRIORITY_PROCESS;
-        }
-
     }
 
     public static class Frequency extends MProcess {
 
         private Frequency() {
-            super();
-        }
-
-        public Frequency(boolean sync, int command, byte[] in) {
-            super(sync, command, in);
-        }
-
-        public Frequency(boolean sync, int command, Information info) {
-            super(sync, command, info);
-        }
-
-        @Override
-        public Command getCommand() {
-            return Command.FRQ_PROCESS;
+            super(Command.FRQ_PROCESS);
         }
     }
+
+    private final Command comm;
 
     protected int idle;
     protected int parse_packet;
     private int[] processes;
 
-    private MProcess() {
+    private MProcess(Command comm) {
         super();
+        this.comm = comm;
     }
 
     public MProcess(boolean sync, int command, byte[] in) {
         super(sync, command, in);
-        processes = new int[in[0]];
-        idle = in[1];
-        parse_packet = in[2];
+        processes = new int[AbstractFrame.byteArrayToInt(in, 0)];
+        idle = AbstractFrame.byteArrayToInt(in, 2);
+        parse_packet = AbstractFrame.byteArrayToInt(in, 4);
         for (int i = 0; i < processes.length; i++) {
-            processes[i] = in[i + 3];
+            processes[i] = AbstractFrame.byteArrayToInt(in, (2*i) + 6);
         }
+        this.comm = Command.getCommand(command);
     }
 
     public MProcess(boolean sync, int command, Information info) {
         super(sync, command, info);
+        this.comm = Command.getCommand(command);
     }
 
     public int[] getProcesses() {
         return processes;
     }
 
+    public int getIdle() {
+        return idle;
+    }
+
+    public int getParse_packet() {
+        return parse_packet;
+    }
+
+    @Override
+    public Command getCommand() {
+        return comm;
+    }
 }

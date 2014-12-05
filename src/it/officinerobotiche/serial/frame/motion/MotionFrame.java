@@ -29,15 +29,15 @@ public abstract class MotionFrame extends AbstractFrame {
 
     public enum Command implements ICommand {
 
-        PID_L(0, "PIDLeft"),
-        PID_R(1, "PIDRight"),
-        MOTOR_L(2, "MotorLeft"),
-        MOTOR_R(3,"MotorRight"),
+        PID_L(0, "PID"),
+        PID_R(1, "PID"),
+        MOTOR_L(2, "Motor"),
+        MOTOR_R(3,"Motor"),
         COORDINATE(4,"Coordinate"),
         PARAM_MOTORS(5,"ParamMotors"),
         CONSTRAINT(6,"Constraint"),
         VELOCITY(7,"Velocity"),
-        VELOCITY_MIS(8,"VelocityMis"),
+        VELOCITY_MIS(8,"Velocity"),
         ENABLE(9,"Enable"),
         EMERGENCY(10,"Emergency"),
         DELTA_ODO(11,"DeltaOdo");
@@ -45,6 +45,7 @@ public abstract class MotionFrame extends AbstractFrame {
         private final int number;
         private final String name;
         private static final Map<Integer, String> lookup = new HashMap<>();
+        private static final Map<Integer, Command> look_comm = new HashMap<>();
 
         private Command(int number, String name) {
             this.number = number;
@@ -69,10 +70,15 @@ public abstract class MotionFrame extends AbstractFrame {
         static {
             for (Command s : EnumSet.allOf(Command.class)) {
                 lookup.put(s.getNumber(), s.getName());
+                look_comm.put(s.getNumber(), s);
             }
         }
+        
+        public static Command getCommand(int number) {
+            return look_comm.get(number);
+        }
 
-        public static String getCommand(int number) {
+        public static String getStringCommand(int number) {
             return lookup.get(number);
         }
     };

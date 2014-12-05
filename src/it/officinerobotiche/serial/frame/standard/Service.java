@@ -16,6 +16,7 @@
  */
 package it.officinerobotiche.serial.frame.standard;
 
+import it.officinerobotiche.serial.frame.AbstractFrame;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,9 +27,13 @@ import java.util.Map;
  */
 public class Service extends StandardFrame {
 
-    private final static int BUFF_SERVICE = 20;
+    public static final Service AUTHOR = new Service(NameService.AUTHOR);
+    public static final Service DATE_CODE = new Service(NameService.DATE_CODE);
+    public static final Service NAME_BOARD = new Service(NameService.NAME_BOARD);
+    public static final Service RESET = new Service(NameService.RESET);
+    public static final Service VERSION = new Service(NameService.VERSION);
 
-    private enum NameService {
+    private static enum NameService {
 
         RESET('*', "Reset"),
         DATE_CODE('d', "Date"),
@@ -52,7 +57,7 @@ public class Service extends StandardFrame {
         public byte getByte() {
             return (byte) name;
         }
-        
+
         @Override
         public String toString() {
             return name_string;
@@ -70,12 +75,8 @@ public class Service extends StandardFrame {
             return lookup.get(Value);
         }
     };
-    
-    public static final Service AUTHOR = new Service(NameService.AUTHOR);
-    public static final Service DATE_CODE = new Service(NameService.DATE_CODE);
-    public static final Service NAME_BOARD = new Service(NameService.NAME_BOARD);
-    public static final Service RESET = new Service(NameService.RESET);
-    public static final Service VERSION = new Service(NameService.VERSION);
+
+    private final static int BUFF_SERVICE = 20;
 
     private String name;
     private NameService service;
@@ -89,19 +90,7 @@ public class Service extends StandardFrame {
     public Service(boolean sync, int command, byte[] in) {
         super(sync, command, in);
         this.service = NameService.get((char) in[0]);
-        this.name = getName(in, 1);
-    }
-
-    private String getName(byte[] data, int start) {
-        String name_data = "";
-        for (int i = start; i < data.length; i++) {
-            if (data[i] != (char) '\0') {
-                name_data += (char) data[i];
-            } else {
-                break;
-            }
-        }
-        return name_data;
+        this.name = AbstractFrame.getString(in, 1);
     }
 
     public Service(boolean sync, int command, Information info) {

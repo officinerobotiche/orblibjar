@@ -44,7 +44,7 @@ public class SerialFrame extends SerialPacket implements PacketListener {
     private final static String CLASS_SUFFIX = ".class";
     private final static String SUBCLASS = "$";
     private final static String ENUM_COMMAND = "Command";
-    private final static String METHOD_FRAME = "getCommand";
+    private final static String METHOD_FRAME = "getStringCommand";
     // List all messages
     private final List<Class<? extends AbstractFrame>> allClasses;
 
@@ -266,7 +266,7 @@ public class SerialFrame extends SerialPacket implements PacketListener {
                         ret.add(asSubclass);
                     }
                 } catch (Exception ex) {
-                    //Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(SerialFrame.class.getString()).log(Level.SEVERE, null, ex);
                 }
             }
         }

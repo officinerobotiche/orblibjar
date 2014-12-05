@@ -16,52 +16,52 @@
  */
 package it.officinerobotiche.serial.frame.motion;
 
+import it.officinerobotiche.serial.frame.AbstractFrame;
+
 /**
  *
  * @author Raffaello Bonghi
  */
-public class PID extends MotionFrame {
+public class Velocity extends MotionFrame {
+    
+    public static final Velocity VELOCITY = new Velocity(Command.VELOCITY);
+    public static final Velocity VELOCITY_MIS = new Velocity(Command.VELOCITY_MIS);
 
-    public static final PID LEFT = new PID(Command.PID_L);
-    public static final PID RIGHT = new PID(Command.PID_R);
-
-    public static class PIDLeft extends PID {
-        
-        public PIDLeft() {
-            super(Command.PID_L);
-        }
-
-        public PIDLeft(float k_p, float k_i, float k_d) {
-            super(Command.PID_L);
-        }
-    }
-
-    public static class PIDRight extends PID {
-        
-        public PIDRight() {
-            super(Command.PID_R);
-        }
-
-        public PIDRight(float k_p, float k_i, float k_d) {
-            super(Command.PID_R);
-        }
-    }
-
+    private float linear;
+    private float angular;
     private final Command comm;
 
-    private PID(Command comm) {
+    private Velocity(Command comm) {
         super();
         this.comm = comm;
     }
 
-    public PID(boolean sync, int command, byte[] in) {
+    public Velocity(float lin, float ang) {
+        this.information = Information.REQUEST;
+        this.comm = Command.VELOCITY;
+        this.in = new byte[8];
+        byte[] linbyte = AbstractFrame.floatToByteArray(lin);
+        byte[] angbyte = AbstractFrame.floatToByteArray(ang);
+    }
+
+    public Velocity(boolean sync, int command, byte[] in) {
         super(sync, command, in);
+        this.comm = Command.getCommand(command);
+        this.linear = AbstractFrame.byteArrayToFloat(in, 0);
+        this.angular = AbstractFrame.byteArrayToFloat(in, 4);
+    }
+
+    public Velocity(boolean sync, int command, Information info) {
+        super(sync, command, info);
         this.comm = Command.getCommand(command);
     }
 
-    public PID(boolean sync, int command, Information info) {
-        super(sync, command, info);
-        this.comm = Command.getCommand(command);
+    public float getLinear() {
+        return linear;
+    }
+
+    public float getAngular() {
+        return angular;
     }
 
     @Override

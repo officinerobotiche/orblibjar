@@ -99,7 +99,7 @@ public abstract class AbstractFrame implements Jmessage {
         this.in = in;
         this.information = Information.DATA;
     }
-    
+
     abstract public TypeMessage getTypeMessage();
 
     @Override
@@ -125,17 +125,37 @@ public abstract class AbstractFrame implements Jmessage {
         return sync;
     }
 
-    protected static float getFloat(byte[] in, int pos) {
-        byte[] float_data = new byte[4];
-        System.arraycopy(in, pos, float_data, 0, 4);
-        return ByteBuffer.wrap(float_data).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+    public static String getString(byte[] data, int start) {
+        String name_data = "";
+        for (int i = start; i < data.length; i++) {
+            if (data[i] != (char) '\0') {
+                name_data += (char) data[i];
+            } else {
+                break;
+            }
+        }
+        return name_data;
+    }
+    
+    public static int byteArrayToInt(byte[] b, int offset) {
+        ByteBuffer buf = ByteBuffer.wrap(b, offset, 2).order(ByteOrder.LITTLE_ENDIAN);
+        return buf.getInt();
+    }
+    
+    public static float byteArrayToFloat(byte[] b, int offset) {
+        ByteBuffer buf = ByteBuffer.wrap(b, offset, 4).order(ByteOrder.LITTLE_ENDIAN);
+        return buf.getFloat();
+    }
+    
+    public static byte[] intToByteArray(int value) {
+        return ByteBuffer.allocate(2).putInt(value).array();
     }
 
-    public static byte[] long2ByteArray(long value) {
-        return ByteBuffer.allocate(8).putLong(value).array();
+    public static byte[] longToByteArray(long value) {
+        return ByteBuffer.allocate(4).putLong(value).array();
     }
 
-    public static byte[] float2ByteArray(float value) {
+    public static byte[] floatToByteArray(float value) {
         return ByteBuffer.allocate(4).putFloat(value).array();
     }
 
