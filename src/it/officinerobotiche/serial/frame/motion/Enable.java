@@ -22,21 +22,58 @@ package it.officinerobotiche.serial.frame.motion;
  */
 public class Enable extends MotionFrame {
     
+    public static final Enable ENABLE = new Enable();
+
+    private boolean enable;
+
     public Enable() {
         super();
+        this.in = new byte[1];
+    }
+    
+    public Enable(boolean enable) {
+        super();
+        this.in = new byte[1];
+        this.enable = enable;
+        buildData();
     }
 
     public Enable(boolean sync, int command, byte[] in) {
         super(sync, command, in);
+        this.enable = (in[0] == 1);
     }
-    
+
     public Enable(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
-    
+
     @Override
     public Command getCommand() {
         return Command.ENABLE;
     }
     
+    @Override
+    protected void buildData() {
+        this.in[0] = (byte) (this.enable ? 1 : 0);
+    }
+
+    /**
+     * Get the value of enable
+     *
+     * @return the value of enable
+     */
+    public boolean isEnable() {
+        return enable;
+    }
+
+    /**
+     * Set the value of enable
+     *
+     * @param enable new value of enable
+     */
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+        buildData();
+    }
+
 }

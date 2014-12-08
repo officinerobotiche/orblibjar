@@ -39,4 +39,9 @@ public class Emergency extends MotionFrame {
         return Command.EMERGENCY;
     }
     
+    @Override
+    protected final void buildData() {
+        
+    }
+    
 }

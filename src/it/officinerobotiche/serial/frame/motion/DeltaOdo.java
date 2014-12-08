@@ -21,7 +21,7 @@ package it.officinerobotiche.serial.frame.motion;
  * @author Raffaello Bonghi
  */
 public class DeltaOdo extends MotionFrame {
-    
+
     public DeltaOdo() {
         super();
     }
@@ -29,14 +29,19 @@ public class DeltaOdo extends MotionFrame {
     public DeltaOdo(boolean sync, int command, byte[] in) {
         super(sync, command, in);
     }
-    
+
     public DeltaOdo(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
-    
+
     @Override
     public Command getCommand() {
         return Command.DELTA_ODO;
     }
-    
+
+    @Override
+    protected final void buildData() {
+
+    }
+
 }

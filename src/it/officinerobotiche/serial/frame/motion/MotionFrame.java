@@ -102,4 +102,6 @@ public abstract class MotionFrame extends AbstractFrame {
 
     @Override
     abstract public Command getCommand();
+    
+    abstract protected void buildData();
 }

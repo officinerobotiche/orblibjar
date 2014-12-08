@@ -30,6 +30,7 @@ import java.util.Map;
 public abstract class AbstractFrame implements Jmessage {
 
     public static final int LNG_HEADER = 4;
+    protected static final int LNG_BYTE_FLOAT = 4;
 
     public static enum TypeMessage {
 
@@ -136,17 +137,25 @@ public abstract class AbstractFrame implements Jmessage {
         }
         return name_data;
     }
-    
+
     public static int byteArrayToInt(byte[] b, int offset) {
         ByteBuffer buf = ByteBuffer.wrap(b, offset, 2).order(ByteOrder.LITTLE_ENDIAN);
         return buf.getInt();
     }
-    
+
     public static float byteArrayToFloat(byte[] b, int offset) {
-        ByteBuffer buf = ByteBuffer.wrap(b, offset, 4).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer buf = ByteBuffer.wrap(b, offset, LNG_BYTE_FLOAT).order(ByteOrder.LITTLE_ENDIAN);
         return buf.getFloat();
     }
-    
+
+    public static float[] byteArrayToFloatArray(byte[] in, int offset, int count) {
+        float[] val = new float[count];
+        for (int i = 0; i < count; i++) {
+            val[i] = byteArrayToFloat(in, offset + i * LNG_BYTE_FLOAT);
+        }
+        return val;
+    }
+
     public static byte[] intToByteArray(byte[] in, int offset, int value) {
         byte[] array = ByteBuffer.allocate(2).putInt(value).array();
         System.arraycopy(array, 0, in, offset, array.length);
@@ -158,8 +167,15 @@ public abstract class AbstractFrame implements Jmessage {
     }
 
     public static byte[] floatToByteArray(byte[] in, int offset, float value) {
-        byte[] array = ByteBuffer.allocate(4).putFloat(value).array();
+        byte[] array = ByteBuffer.allocate(LNG_BYTE_FLOAT).putFloat(value).array();
         System.arraycopy(array, 0, in, offset, array.length);
+        return in;
+    }
+
+    public static byte[] floatArrayToByteArray(byte[] in, int offset, float[] value) {
+        for (int i = 0; i < value.length; i++) {
+            in = floatToByteArray(in, offset + i*LNG_BYTE_FLOAT, value[i]);
+        }
         return in;
     }
 

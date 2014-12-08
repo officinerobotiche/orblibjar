@@ -57,7 +57,8 @@ public class Velocity extends MotionFrame {
         this.comm = Command.getCommand(command);
     }
 
-    private void buildData() {
+    @Override
+    protected final void buildData() {
         this.in = AbstractFrame.floatToByteArray(in, 0, this.linear);
         this.in = AbstractFrame.floatToByteArray(in, 4, this.angular);
     }
