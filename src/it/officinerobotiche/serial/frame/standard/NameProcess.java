@@ -24,32 +24,28 @@ import it.officinerobotiche.serial.frame.AbstractFrame;
  */
 public class NameProcess extends StandardFrame {
 
-    public static NameProcess LENGTH = new NameProcess(Type.LENGTH);
+    public final NameProcess LENGTH = new NameProcess(REQUIRE_LENGTH);
 
+    private static int REQUIRE_LENGTH = -1;
     private static int BUFF_NAME_PROCESS = 20;
+    private int number;
+    private String name;
 
-    private enum Type {
-
-        LENGTH, NAME;
-    }
-
-    private NameProcess(Type type) {
+    public NameProcess(int number) {
         this.information = Information.REQUEST;
+        this.number = number;
         this.in = new byte[BUFF_NAME_PROCESS + 2];
-        switch (type) {
-            case LENGTH:
-                byte[] lng = AbstractFrame.intToByteArray(-1);
-                this.in[0] = lng[0];
-                this.in[1] = lng[1];
-                break;
-            case NAME:
-
-                break;
-        }
+        this.in = AbstractFrame.intToByteArray(in, 0, number);
     }
 
     public NameProcess(boolean sync, int command, byte[] in) {
         super(sync, command, in);
+        this.number = AbstractFrame.byteArrayToInt(in, 0);
+        if (number != REQUIRE_LENGTH) {
+            this.name = AbstractFrame.getString(in, 2);
+        } else {
+            this.name = null;
+        }
     }
 
     public NameProcess(boolean sync, int command, Information info) {
@@ -59,6 +55,14 @@ public class NameProcess extends StandardFrame {
     @Override
     public Command getCommand() {
         return Command.NAME_PROCESS;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

@@ -16,6 +16,8 @@
  */
 package it.officinerobotiche.serial.frame.standard;
 
+import it.officinerobotiche.serial.frame.AbstractFrame;
+
 /**
  *
  * @author Raffaello Bonghi
@@ -31,8 +33,8 @@ public class ParamSystem extends StandardFrame {
 
     public ParamSystem(boolean sync, int command, byte[] in) {
         super(sync, command, in);
-        stepTimer = in[0];
-        timeMill = in[1];
+        stepTimer = AbstractFrame.byteArrayToInt(in, 0);
+        timeMill = AbstractFrame.byteArrayToInt(in, 2);
     }
     
     public ParamSystem(boolean sync, int command, Information info) {

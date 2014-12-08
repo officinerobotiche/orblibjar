@@ -23,7 +23,7 @@ import it.officinerobotiche.serial.frame.AbstractFrame;
  * @author Raffaello Bonghi
  */
 public class Velocity extends MotionFrame {
-    
+
     public static final Velocity VELOCITY = new Velocity(Command.VELOCITY);
     public static final Velocity VELOCITY_MIS = new Velocity(Command.VELOCITY_MIS);
 
@@ -40,8 +40,9 @@ public class Velocity extends MotionFrame {
         this.information = Information.REQUEST;
         this.comm = Command.VELOCITY;
         this.in = new byte[8];
-        byte[] linbyte = AbstractFrame.floatToByteArray(lin);
-        byte[] angbyte = AbstractFrame.floatToByteArray(ang);
+        this.linear = lin;
+        this.angular = ang;
+        buildData();
     }
 
     public Velocity(boolean sync, int command, byte[] in) {
@@ -54,6 +55,31 @@ public class Velocity extends MotionFrame {
     public Velocity(boolean sync, int command, Information info) {
         super(sync, command, info);
         this.comm = Command.getCommand(command);
+    }
+
+    private void buildData() {
+        this.in = AbstractFrame.floatToByteArray(in, 0, this.linear);
+        this.in = AbstractFrame.floatToByteArray(in, 4, this.angular);
+    }
+
+    public boolean setLinear(float linear) {
+        if (comm.equals(Command.VELOCITY)) {
+            this.linear = linear;
+            buildData();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean setAngular(float angular) {
+        if (comm.equals(Command.VELOCITY)) {
+            this.angular = angular;
+            buildData();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public float getLinear() {

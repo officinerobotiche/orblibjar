@@ -147,16 +147,20 @@ public abstract class AbstractFrame implements Jmessage {
         return buf.getFloat();
     }
     
-    public static byte[] intToByteArray(int value) {
-        return ByteBuffer.allocate(2).putInt(value).array();
+    public static byte[] intToByteArray(byte[] in, int offset, int value) {
+        byte[] array = ByteBuffer.allocate(2).putInt(value).array();
+        System.arraycopy(array, 0, in, offset, array.length);
+        return in;
     }
 
     public static byte[] longToByteArray(long value) {
         return ByteBuffer.allocate(4).putLong(value).array();
     }
 
-    public static byte[] floatToByteArray(float value) {
-        return ByteBuffer.allocate(4).putFloat(value).array();
+    public static byte[] floatToByteArray(byte[] in, int offset, float value) {
+        byte[] array = ByteBuffer.allocate(4).putFloat(value).array();
+        System.arraycopy(array, 0, in, offset, array.length);
+        return in;
     }
 
     //@Override

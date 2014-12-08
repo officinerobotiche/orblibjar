@@ -30,16 +30,18 @@ public class Service extends StandardFrame {
     public static final Service AUTHOR = new Service(NameService.AUTHOR);
     public static final Service DATE_CODE = new Service(NameService.DATE_CODE);
     public static final Service NAME_BOARD = new Service(NameService.NAME_BOARD);
+    public static final Service TYPE_BOARD = new Service(NameService.TYPE_BOARD);
     public static final Service RESET = new Service(NameService.RESET);
     public static final Service VERSION = new Service(NameService.VERSION);
 
     private static enum NameService {
 
-        RESET('*', "Reset"),
+        AUTHOR('a', "Author"),
         DATE_CODE('d', "Date"),
         NAME_BOARD('n', "Name board"),
-        VERSION('v', "Version"),
-        AUTHOR('a', "Author");
+        TYPE_BOARD('t',"Type board"),
+        RESET('*', "Reset"),
+        VERSION('v', "Version");
 
         private final char name;
         private final String name_string;
