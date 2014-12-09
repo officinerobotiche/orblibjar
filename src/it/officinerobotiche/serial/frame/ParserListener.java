@@ -19,10 +19,16 @@ package it.officinerobotiche.serial.frame;
 import java.util.EventListener;
 
 /**
+ * Interface associated to receive a frame message from SeralFrame object.
  *
  * @author Raffaello Bonghi
  */
 public interface ParserListener extends EventListener {
-    
+
+    /**
+     * Method to receive a single Frame.
+     *
+     * @param frame message to cast.
+     */
     public void parserEvent(AbstractFrame frame);
 }

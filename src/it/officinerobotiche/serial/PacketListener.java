@@ -20,12 +20,15 @@ import java.util.EventListener;
 
 /**
  * Interface to receive Asyncronous packet.
+ *
  * @author Raffaello Bonghi
  */
 public interface PacketListener extends EventListener {
+
     /**
      * Method to receive a Packet.
-     * @param packet 
+     *
+     * @param packet object Packet received.
      */
     public void asyncPacketEvent(Packet packet);
 }
