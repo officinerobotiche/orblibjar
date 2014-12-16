@@ -21,27 +21,55 @@ package it.officinerobotiche.serial.frame.motion;
  * @author Raffaello Bonghi
  */
 public class Emergency extends MotionFrame {
-    
+
+    /**
+     * Initialize Emergency message. This Constructor is used for require data
+     * from board.
+     */
     public Emergency() {
         super();
     }
 
+    /**
+     * Initialize message with data received from board. This message is used
+     * normally from parser to set data received, it is a message with data.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param in byte received.
+     */
     public Emergency(boolean sync, int command, byte[] in) {
         super(sync, command, in);
     }
-    
+
+    /**
+     * Initialize message with ACK, NACK information. This message is used
+     * normally from parser.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param info Information about message.
+     */
     public Emergency(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
-    
+
+    /**
+     * Command associated at this object. This is a constant enumeration.
+     *
+     * @return Enumeration command.
+     */
     @Override
     public Command getCommand() {
         return Command.EMERGENCY;
     }
-    
+
+    /**
+     * Construct byte data array with information on object.
+     */
     @Override
     protected final void buildData() {
-        
+
     }
-    
+
 }

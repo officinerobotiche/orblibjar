@@ -116,7 +116,7 @@ public abstract class AbstractFrame implements Jmessage {
         }
 
         /**
-         * Static collection all Enumeration rescpect character name.
+         * Static collection all Enumeration with character name.
          */
         static {
             for (TypeMessage s : EnumSet.allOf(TypeMessage.class)) {
@@ -222,9 +222,11 @@ public abstract class AbstractFrame implements Jmessage {
         frame.add(information.getByte());
         frame.add(getTypeMessage().getByte());
         frame.add(getCommand().getByte());
-        if (in != null) {
-            for (byte i : in) {
-                frame.add(i);
+        if (information == Information.DATA) {
+            if (in != null) {
+                for (byte i : in) {
+                    frame.add(i);
+                }
             }
         }
         return frame;

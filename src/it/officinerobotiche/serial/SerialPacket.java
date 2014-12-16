@@ -32,10 +32,13 @@ import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 
 /**
- * Object to send and receive a Packet object from serial port with O-RB protocol.
+ * Object to send and receive a Packet object from serial port with O-RB
+ * protocol.
+ *
  * @author Raffaello Bonghi
  */
 public class SerialPacket implements SerialPortEventListener {
+
     /**
      * Serial port object to communicate with board.
      */
@@ -56,6 +59,10 @@ public class SerialPacket implements SerialPortEventListener {
      * Milliseconds to block while waiting for port open
      */
     private static final int TIME_OUT = 2000;
+    /**
+     * Time to wait a packet before timeout.
+     */
+    private int timeoutSendPacket = 2000;
     /**
      * Default bits per second for COM port.
      */
@@ -86,6 +93,14 @@ public class SerialPacket implements SerialPortEventListener {
      */
     protected EventListenerList listenerList = new EventListenerList();
 
+    /**
+     * Initialize serial port. Open with timeout a serial port with this
+     * configuration: DATABITS = 8; STOP BITS = 1; PARITY = NONE. Open two
+     * stream to communicate with serial port and finally associate an event
+     * listener to receive bytes.
+     *
+     * @param portName Name serial port to connect.
+     */
     public SerialPacket(String portName) {
         try {
             CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
@@ -208,7 +223,7 @@ public class SerialPacket implements SerialPortEventListener {
 
             //Length of packet
             case 1:
-                packet.setLengthPkg((int) bytePkg);
+                packet.setLengthPkg(bytePkg);
                 statusDec++;
                 break;
 
@@ -223,10 +238,20 @@ public class SerialPacket implements SerialPortEventListener {
         return false;
     }
 
+    /**
+     * Add a packet listener.
+     *
+     * @param listener add listener of packets.
+     */
     public void addPacketEventListener(PacketListener listener) {
         listenerList.add(PacketListener.class, listener);
     }
 
+    /**
+     * Remove a packet listener.
+     *
+     * @param listener remove listener of packets.
+     */
     public void removePacketEventListener(PacketListener listener) {
         listenerList.remove(PacketListener.class, listener);
     }
@@ -241,16 +266,18 @@ public class SerialPacket implements SerialPortEventListener {
     }
 
     /**
-     * Send packet on serial port.
+     * Send packet on serial port. This function is a blocking function.
      *
      * @param packet Packet to send
-     * @return
+     * @return Packet received.
+     * @throws java.lang.InterruptedException If do not receive a packet in
+     * timeoutSendPacket
      */
     protected Packet sendPacket(Packet packet) throws InterruptedException {
         if (packet.isSync()) {
             try {
                 out.write(convertPacket(packet));
-                block.block();
+                block.block(timeoutSendPacket);
                 return this.packet;
             } catch (IOException ex) {
                 Logger.getLogger(SerialPacket.class.getName()).log(Level.SEVERE, null, ex);
@@ -264,8 +291,8 @@ public class SerialPacket implements SerialPortEventListener {
     /**
      * Build a packet to send.
      *
-     * @param data
-     * @return
+     * @param packet Packet to convert.
+     * @return convert all data in bytes to send in serial port.
      */
     private static byte[] convertPacket(Packet packet) {
         //Dimension of packet
@@ -277,7 +304,7 @@ public class SerialPacket implements SerialPortEventListener {
         //Copy all data bytes in array to send
         System.arraycopy(packet.getDataStructure(), 0, dataSend, LNG_HEADER, packet.getLengthPkg());
         //Evaluate checkSum
-        dataSend[LNG_HEADER + packet.getLengthPkg()] = (byte) checkSum(packet.getDataStructure());
+        dataSend[LNG_HEADER + packet.getLengthPkg()] = checkSum(packet.getDataStructure());
         return dataSend;
     }
 

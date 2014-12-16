@@ -19,22 +19,58 @@ package it.officinerobotiche.serial.frame.motion;
 import it.officinerobotiche.serial.frame.AbstractFrame;
 
 /**
+ * Definition for coordinate robot. 1) position [x, y, theta] 2) space. Used IS 
+ * to configure this data, in particular meter and radiand.
  *
  * @author Raffaello Bonghi
  */
 public class Coordinate extends MotionFrame {
-    
+
+    /**
+     * Quick definition for coordinate frame message. This is usefull on require
+     * a information on board.
+     */
     public static final Coordinate COORDINATE = new Coordinate();
 
+    /**
+     * Length of coordiante frame. Four floats for all data.
+     */
     private final static int LNG_COORD = 4 * 4;
-    protected float x, y, theta;
+    /**
+     * X position.
+     */
+    protected float x,
+            /**
+             * Y position.
+             */
+            y,
+            /**
+             * Angle position.
+             */
+            theta;
+
+    /**
+     * Distance robot.
+     */
     protected float space = 0;
 
+    /**
+     * Initialize coordinate message. This Constructor is used for require data
+     * from board.
+     */
     private Coordinate() {
         super();
         this.in = new byte[LNG_COORD];
     }
 
+    /**
+     * Initialiaze coordindate message with x,y,theta position robot. This
+     * message is a message with data.
+     *
+     * @param x cartesian postion x.
+     * @param y cartesian postion y.
+     * @param theta angle respect x axis.
+     */
     public Coordinate(float x, float y, float theta) {
         super();
         this.in = new byte[LNG_COORD];
@@ -44,6 +80,14 @@ public class Coordinate extends MotionFrame {
         buildData();
     }
 
+    /**
+     * Initialize message with data received from board. This message is used
+     * normally from parser to set data received, it is a message with data.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param in byte received.
+     */
     public Coordinate(boolean sync, int command, byte[] in) {
         super(sync, command, in);
         this.x = AbstractFrame.byteArrayToFloat(in, 0);
@@ -52,17 +96,33 @@ public class Coordinate extends MotionFrame {
         this.space = AbstractFrame.byteArrayToFloat(in, 12);
     }
 
+    /**
+     * Initialize message with ACK, NACK information. This message is used
+     * normally from parser.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param info Information about message.
+     */
     public Coordinate(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
 
+    /**
+     * Command associated at this object. This is a constant enumeration.
+     *
+     * @return Enumeration command.
+     */
     @Override
     public Command getCommand() {
         return Command.COORDINATE;
     }
-    
+
+    /**
+     * Construct byte data array with information on object.
+     */
     @Override
-    protected void buildData() {
+    protected final void buildData() {
         this.in = AbstractFrame.floatToByteArray(in, 0, x);
         this.in = AbstractFrame.floatToByteArray(in, 4, y);
         this.in = AbstractFrame.floatToByteArray(in, 8, theta);

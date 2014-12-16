@@ -17,20 +17,38 @@
 package it.officinerobotiche.serial.frame.motion;
 
 /**
+ * Defintion for enable message. You can set or read state of bridge motor.
  *
  * @author Raffaello Bonghi
  */
 public class Enable extends MotionFrame {
-    
+
+    /**
+     * Quick definition for coordinate frame message. This is usefull on require
+     * a information on board.
+     */
     public static final Enable ENABLE = new Enable();
 
+    /**
+     * Definition for enable information bridge motor.
+     */
     private boolean enable;
 
+    /**
+     * Initialize enable message. This Constructor is used for require data from
+     * board.
+     */
     public Enable() {
         super();
         this.in = new byte[1];
     }
-    
+
+    /**
+     * Initialize message with configuration enable bridge motor. This message
+     * is a message with data.
+     *
+     * @param enable state of bridge motor.
+     */
     public Enable(boolean enable) {
         super();
         this.in = new byte[1];
@@ -38,20 +56,44 @@ public class Enable extends MotionFrame {
         buildData();
     }
 
+    /**
+     * Initialize message with data received from board. This message is used
+     * normally from parser to set data received, it is a message with data.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param in byte received.
+     */
     public Enable(boolean sync, int command, byte[] in) {
         super(sync, command, in);
         this.enable = (in[0] == 1);
     }
 
+    /**
+     * Initialize message with ACK, NACK information. This message is used
+     * normally from parser.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param info Information about message.
+     */
     public Enable(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
 
+    /**
+     * Command associated at this object. This is a constant enumeration.
+     *
+     * @return Enumeration command.
+     */
     @Override
     public Command getCommand() {
         return Command.ENABLE;
     }
-    
+
+    /**
+     * Construct byte data array with information on object.
+     */
     @Override
     protected void buildData() {
         this.in[0] = (byte) (this.enable ? 1 : 0);

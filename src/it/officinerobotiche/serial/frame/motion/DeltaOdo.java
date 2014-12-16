@@ -22,23 +22,51 @@ package it.officinerobotiche.serial.frame.motion;
  */
 public class DeltaOdo extends MotionFrame {
 
+    /**
+     * Initialize DeltaOdo message. This Constructor is used for require data
+     * from board.
+     */
     public DeltaOdo() {
         super();
     }
 
+    /**
+     * Initialize message with data received from board. This message is used
+     * normally from parser to set data received, it is a message with data.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param in byte received.
+     */
     public DeltaOdo(boolean sync, int command, byte[] in) {
         super(sync, command, in);
     }
 
+    /**
+     * Initialize message with ACK, NACK information. This message is used
+     * normally from parser.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param info Information about message.
+     */
     public DeltaOdo(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
 
+    /**
+     * Command associated at this object. This is a constant enumeration.
+     *
+     * @return Enumeration command.
+     */
     @Override
     public Command getCommand() {
         return Command.DELTA_ODO;
     }
 
+    /**
+     * Construct byte data array with information on object.
+     */
     @Override
     protected final void buildData() {
 

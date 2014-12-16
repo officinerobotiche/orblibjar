@@ -19,26 +19,74 @@ package it.officinerobotiche.serial.frame.motion;
 import it.officinerobotiche.serial.frame.AbstractFrame;
 
 /**
+ * Definition parameters on robots. You can set radius and wheelbase on unicycle
+ * robot. Gain to convert value read from Input capture or QEI. Used IS to
+ * configure this data, in particular meter, radiand, radians to sec.
  *
  * @author Raffaello Bonghi
  */
 public class ParamMotors extends MotionFrame {
 
+    /**
+     * Quick definition for parameters motors frame message. This is usefull on
+     * require a information on board.
+     */
     public static final ParamMotors PARAM_MOTORS = new ParamMotors();
-    
-    private static final int LNG_PARAM_MOTOR = 4*2+4+4*2+4*2+4+2;
+
+    /**
+     * Length of velocity frame. Two floats for all data.
+     */
+    private static final int LNG_PARAM_MOTOR = 4 * 2 + 4 + 4 * 2 + 4 * 2 + 4 + 2;
+
+    /**
+     * Radius wheel. First is left wheel, secondo right wheel.
+     */
     private float[] radius = new float[2];
+
+    /**
+     * Wheelbase robot.
+     */
     private float wheelBase;
+
+    /**
+     * Gain to convert value read from input capture to measure velocity from
+     * motor. First is left motor, secondo right motor.
+     */
     private float[] kVel = new float[2];
+
+    /**
+     * Gain to convert value read from QEI to measure angular position from
+     * motor. First is left motor, secondo right motor.
+     */
     private float[] kAng = new float[2];
+
+    /**
+     * Minimum value to set odometry in "linear movement".
+     */
     private float spMin;
+
+    /**
+     * Value of pwm step used in this board.
+     */
     private int pwmStep;
 
+    /**
+     * Initialize parameters motors message. This Constructor is used for
+     * require data from board.
+     */
     public ParamMotors() {
         super();
         this.in = new byte[LNG_PARAM_MOTOR];
     }
 
+    /**
+     * Initialize message with data received from board. This message is used
+     * normally from parser to set data received, it is a message with data.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param in byte received.
+     */
     public ParamMotors(boolean sync, int command, byte[] in) {
         super(sync, command, in);
         this.radius = AbstractFrame.byteArrayToFloatArray(in, 0, 2);
@@ -49,6 +97,14 @@ public class ParamMotors extends MotionFrame {
         this.pwmStep = AbstractFrame.byteArrayToInt(in, 32);
     }
 
+    /**
+     * Initialize message with ACK, NACK information. This message is used
+     * normally from parser.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param info Information about message.
+     */
     public ParamMotors(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
@@ -58,6 +114,9 @@ public class ParamMotors extends MotionFrame {
         return Command.PARAM_MOTORS;
     }
 
+    /**
+     * Construct byte data array with information on object.
+     */
     @Override
     protected void buildData() {
         this.in = AbstractFrame.floatArrayToByteArray(in, 0, this.radius);

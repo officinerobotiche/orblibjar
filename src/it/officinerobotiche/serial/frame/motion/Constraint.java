@@ -19,21 +19,46 @@ package it.officinerobotiche.serial.frame.motion;
 import it.officinerobotiche.serial.frame.AbstractFrame;
 
 /**
+ * Message for definiton contraint for velocity controller. Max velocity for
+ * left and right motor. Used IS to configure this data, in particular rad to
+ * sec.
  *
  * @author Raffaello Bonghi
  */
 public class Constraint extends MotionFrame {
-    
+
+    /**
+     * Quick definition for constraint frame message. This is usefull on require
+     * a information on board.
+     */
     public static final Constraint CONSTRAINT = new Constraint();
 
-    public static final int LNG_CONSTRAINT = 4*2;
+    /**
+     * Length of constraint frame. Two floats for max number velocity.
+     */
+    public static final int LNG_CONSTRAINT = 4 * 2;
+
+    /**
+     * Definition variables, for left and right constraint.
+     */
     private float maxLeft, maxRight;
 
+    /**
+     * Initialize constraint message. This Constructor is used for require data
+     * from board.
+     */
     public Constraint() {
         super();
         this.in = new byte[LNG_CONSTRAINT];
     }
-    
+
+    /**
+     * Initialize constraint message with max left and right value. This message
+     * is a message with data.
+     *
+     * @param maxLeft value for left constraint in rad to sec.
+     * @param maxRight value for right constraint in rad to sec.
+     */
     public Constraint(float maxLeft, float maxRight) {
         super();
         this.in = new byte[LNG_CONSTRAINT];
@@ -42,22 +67,46 @@ public class Constraint extends MotionFrame {
         buildData();
     }
 
+    /**
+     * Initialize message with data received from board. This message is used
+     * normally from parser to set data received, it is a message with data.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param in byte received.
+     */
     public Constraint(boolean sync, int command, byte[] in) {
         super(sync, command, in);
         this.maxLeft = AbstractFrame.byteArrayToFloat(in, 0);
         this.maxRight = AbstractFrame.byteArrayToFloat(in, 4);
     }
 
+    /**
+     * Initialize message with ACK, NACK information. This message is used
+     * normally from parser.
+     *
+     * @param sync type of packet received (syncronous or not).
+     * @param command type command received.
+     * @param info Information about message.
+     */
     public Constraint(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
-    
+
+    /**
+     * Construct byte data array with information on object.
+     */
     @Override
     protected final void buildData() {
         this.in = AbstractFrame.floatToByteArray(in, 0, maxLeft);
         this.in = AbstractFrame.floatToByteArray(in, 4, maxRight);
     }
 
+    /**
+     * Command associated at this object. This is a constant enumeration.
+     *
+     * @return Enumeration command.
+     */
     @Override
     public Command getCommand() {
         return Command.CONSTRAINT;

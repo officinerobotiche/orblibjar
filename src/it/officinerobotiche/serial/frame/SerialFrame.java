@@ -16,7 +16,9 @@
  */
 package it.officinerobotiche.serial.frame;
 
-import it.officinerobotiche.serial.*;
+import it.officinerobotiche.serial.Packet;
+import it.officinerobotiche.serial.PacketListener;
+import it.officinerobotiche.serial.SerialPacket;
 import it.officinerobotiche.serial.frame.Jmessage.Information;
 import java.io.File;
 import java.io.IOException;
@@ -34,22 +36,53 @@ import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 
 /**
+ * Object to send and receive message. This object connect to serial packet.
  *
  * @author Raffaello Bonghi
  */
 public class SerialFrame extends SerialPacket implements PacketListener {
 
+    /**
+     * Defition dot for reflection.
+     */
     private final static char DOT = '.';
+    /**
+     * Definition slash for reflection.
+     */
     private final static char SLASH = '/';
+    /**
+     * Suffix for class.
+     */
     private final static String CLASS_SUFFIX = ".class";
+    /**
+     * Definition for subclass.
+     */
     private final static String SUBCLASS = "$";
+    /**
+     * Definition enumeration for command. You must have this enumeration,
+     * extends ICommand on Jmessage.
+     */
     private final static String ENUM_COMMAND = "Command";
+    /**
+     * Definition method to read associated string for name class command.
+     */
     private final static String METHOD_FRAME = "getStringCommand";
-    // List all messages
+    /**
+     * List all tyoe messages. This list used on initialization for save all
+     * class that extend AbstractFrame.
+     */
     private final List<Class<? extends AbstractFrame>> allClasses;
-
+    /**
+     * List event receiver.
+     */
     protected EventListenerList listenerList = new EventListenerList();
 
+    /**
+     * Initialize serial port using same configuration in SerialPacket.
+     * Associate Packet listener for asyctronous packet.
+     *
+     * @param portName Serial name port.
+     */
     public SerialFrame(String portName) {
         super(portName);
         //Load all messages with extension Jmessage 
@@ -57,6 +90,11 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         super.addPacketEventListener(this);
     }
 
+    /**
+     * Automatic send frame messages received from Asycronous packet.
+     *
+     * @param packet asyncronous packet received from serial port.
+     */
     @Override
     public void asyncPacketEvent(Packet packet) {
         for (AbstractFrame frame : parsePacket(packet)) {
@@ -64,14 +102,29 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
+    /**
+     * Add parser packet listener.
+     *
+     * @param listener add listener of frame messages.
+     */
     public void addParserEventListener(ParserListener listener) {
         listenerList.add(ParserListener.class, listener);
     }
 
+    /**
+     * Remove parser packet listener.
+     *
+     * @param listener remove listener of frame messages.
+     */
     public void removeParserEventListener(ParserListener listener) {
         listenerList.remove(ParserListener.class, listener);
     }
 
+    /**
+     * Send a frame to all event listener.
+     *
+     * @param frame frame to send.
+     */
     private void fireFrameEvent(AbstractFrame frame) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = 0; i < listeners.length; i = i + 2) {
@@ -81,6 +134,12 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
+    /**
+     * Send a list of messages and push on all event listener all frames.
+     *
+     * @param <P> all type of Frame
+     * @param message list message to send.
+     */
     public <P extends AbstractFrame> void parseSyncFrame(ArrayList<P> message) {
         try {
             List<AbstractFrame> sendSyncFrame = sendSyncFrame(message);
@@ -92,6 +151,12 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
+    /**
+     * Send a message and push on all event listener all frames.
+     *
+     * @param <P> all type of Frame
+     * @param message message to send.
+     */
     public <P extends AbstractFrame> void parseSyncFrame(P message) {
         try {
             AbstractFrame sendSyncFrame = sendSyncFrame(message);
@@ -101,6 +166,12 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
+    /**
+     * Send in asyncronus a message.
+     *
+     * @param <P> all type of Frame
+     * @param message message to send.
+     */
     public <P extends AbstractFrame> void sendASyncFrame(P message) {
         try {
             sendFrame(false, message);
@@ -109,6 +180,12 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
+    /**
+     * Send asyncronus list of messages.
+     *
+     * @param <P> all type of Frame
+     * @param message list message to send.
+     */
     public <P extends AbstractFrame> void sendASyncFrame(ArrayList<P> message) {
         try {
             sendFrame(false, message);
@@ -117,14 +194,71 @@ public class SerialFrame extends SerialPacket implements PacketListener {
         }
     }
 
+    /**
+     * Send a message and receive same type of message.
+     *
+     * @param <P> all type of Frame
+     * @param message message to send.
+     * @return list received.
+     * @throws InterruptedException If the serial port go in timeout connection.
+     */
     public <P extends AbstractFrame> P sendSyncFrame(P message) throws InterruptedException {
         return (P) parsePacket(sendFrame(true, message)).get(0);
     }
 
+    /**
+     * Send a list of messages and receive a same list with all frames.
+     *
+     * @param <P> all type of Frame
+     * @param message list of message to send.
+     * @return list received.
+     * @throws InterruptedException If the serial port go in timeout connection.
+     */
     public <P extends AbstractFrame> List<AbstractFrame> sendSyncFrame(ArrayList<P> message) throws InterruptedException {
         return parsePacket(sendFrame(true, message));
     }
 
+    /**
+     * Send a packet in serial port and set type of message.
+     *
+     * @param <P> all type of Frame
+     * @param sync type of packet.
+     * @param message message to send.
+     * @return Packet from serial port.
+     * @throws InterruptedException If board does not respond in timeout limit
+     */
+    private <P extends AbstractFrame> Packet sendFrame(boolean sync, P message) throws InterruptedException {
+        Packet packet = new Packet(sync);
+        packet.addMessage(message.getFrame());
+        return super.sendPacket(packet);
+    }
+
+    /**
+     * Send a list of packet in serial port and set type of message.
+     *
+     * @param <P> all type of Frame
+     * @param sync type of packet.
+     * @param message list of message to send.
+     * @return Packet from serial port.
+     * @throws InterruptedException If board does not respond in timeout limit
+     */
+    private <P extends AbstractFrame> Packet sendFrame(boolean sync, ArrayList<P> message) throws InterruptedException {
+        Packet packet = new Packet(sync);
+        for (P message_i : message) {
+            packet.addMessage(message_i.getFrame());
+        }
+        return super.sendPacket(packet);
+    }
+
+    /**
+     * This method parse a packet with reflection. Use to decode a packet the
+     * information collected on head frame: 1) length of packet 2) type of
+     * message 3) Command. The parser find a same object associated in
+     * enumeration on AbstractFrame and start a new instance associated.
+     *
+     * @param packet Packet to read and transform in a list of packets.
+     * @return a list with all frame casted.
+     */
     public List<AbstractFrame> parsePacket(Packet packet) {
         ArrayList<AbstractFrame> list_receive = new ArrayList<>();
         byte[] data = packet.getDataStructure();
@@ -156,12 +290,40 @@ public class SerialFrame extends SerialPacket implements PacketListener {
                         break;
                 }
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return list_receive;
     }
 
+    /**
+     * Reconstruct from int variable a associated name class. This method use
+     * reflection to invoke method relative in class.
+     *
+     * @param abstractClass Name abstract class to fine relative command in
+     * enumeration
+     * @param comm_rec Command to find command.
+     * @return Name frame.
+     */
+    private static String getNameFrame(String abstractClass, int comm_rec) {
+        try {
+            Class<?> forName = Class.forName(abstractClass + SUBCLASS + ENUM_COMMAND);
+            Method method = forName.getMethod(METHOD_FRAME, int.class);
+            return (String) method.invoke(null, comm_rec);
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    /**
+     * Find a class name from name class to relative abstract class and name
+     * frame.
+     *
+     * @param abstractClass name abstract class
+     * @param frame name frame
+     * @return class frame.˙
+     */
     private Class<? extends AbstractFrame> getClassFrame(String abstractClass, String frame) {
         for (Class<? extends AbstractFrame> classMes : allClasses) {
             try {
@@ -175,31 +337,6 @@ public class SerialFrame extends SerialPacket implements PacketListener {
             }
         }
         return null;
-    }
-
-    private static String getNameFrame(String abstractClass, int comm_rec) {
-        try {
-            Class<?> forName = Class.forName(abstractClass + SUBCLASS + ENUM_COMMAND);
-            Method method = forName.getMethod(METHOD_FRAME, int.class);
-            return (String) method.invoke(null, comm_rec);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(SerialFrame.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-    }
-
-    private <P extends AbstractFrame> Packet sendFrame(boolean sync, P message) throws InterruptedException {
-        Packet packet = new Packet(sync);
-        packet.addMessage(message.getFrame());
-        return super.sendPacket(packet);
-    }
-
-    private <P extends AbstractFrame> Packet sendFrame(boolean sync, ArrayList<P> message) throws InterruptedException {
-        Packet packet = new Packet(sync);
-        for (P message_i : message) {
-            packet.addMessage(message_i.getFrame());
-        }
-        return super.sendPacket(packet);
     }
 
     /**
