@@ -281,6 +281,18 @@ public abstract class AbstractFrame implements Jmessage {
     }
 
     /**
+     * Convert from byte array in boolean variable.
+     *
+     * @param b byte array.
+     * @param offset offset.
+     * @return boolean value associated.
+     */
+    public static boolean byteArrayToBoolean(byte[] b, int offset) {
+        ByteBuffer buf = ByteBuffer.wrap(b, offset, 1).order(ByteOrder.LITTLE_ENDIAN);
+        return (buf.getInt() == 1);
+    }
+
+    /**
      * Convert from byte array in float variable.
      *
      * @param b byte array.
@@ -306,6 +318,21 @@ public abstract class AbstractFrame implements Jmessage {
             val[i] = byteArrayToFloat(b, offset + i * LNG_BYTE_FLOAT);
         }
         return val;
+    }
+
+    /**
+     * Convert boolean value and ad in array.
+     *
+     * @param in array to add converted integer value.
+     * @param offset offset to put the variable.
+     * @param value integer variable.
+     * @return the same byte array variable in with boolean value converted.
+     */
+    public static byte[] booleanToByteArray(byte[] in, int offset, boolean value) {
+        byte conv = (byte) (value ? 1 : 0 );
+        byte[] array = ByteBuffer.allocate(1).put((byte) conv).array();
+        System.arraycopy(array, 0, in, offset, array.length);
+        return in;
     }
 
     /**

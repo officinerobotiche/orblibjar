@@ -20,23 +20,22 @@ import it.officinerobotiche.serial.frame.AbstractFrame;
 
 /**
  * Definition parameters on robots. You can set radius and wheelbase on unicycle
- * robot. Gain to convert value read from Input capture or QEI. Used IS to
- * configure this data, in particular meter, radiand, radians to sec.
+ * robot, in particular meter, radiand, radians to sec.
  *
  * @author Raffaello Bonghi
  */
-public class ParamMotors extends MotionFrame {
+public class ParamUnicycle extends MotionFrame {
 
     /**
-     * Quick definition for parameters motors frame message. This is usefull on
+     * Quick definition for parameters unicycle frame message. This is usefull on
      * require a information on board.
      */
-    public static final ParamMotors PARAM_MOTORS = new ParamMotors();
+    public static final ParamUnicycle PARAM_UNICYCLE = new ParamUnicycle();
 
     /**
      * Length of velocity frame. Two floats for all data.
      */
-    private static final int LNG_PARAM_MOTOR = 4 * 2 + 4 + 4 * 2 + 4 * 2 + 4 + 2;
+    private static final int LNG_PARAM_MOTOR = 4 * 4;
 
     /**
      * Radius wheel. First is left wheel, secondo right wheel.
@@ -49,32 +48,15 @@ public class ParamMotors extends MotionFrame {
     private float wheelBase;
 
     /**
-     * Gain to convert value read from input capture to measure velocity from
-     * motor. First is left motor, secondo right motor.
-     */
-    private float[] kVel = new float[2];
-
-    /**
-     * Gain to convert value read from QEI to measure angular position from
-     * motor. First is left motor, secondo right motor.
-     */
-    private float[] kAng = new float[2];
-
-    /**
      * Minimum value to set odometry in "linear movement".
      */
     private float spMin;
 
     /**
-     * Value of pwm step used in this board.
-     */
-    private int pwmStep;
-
-    /**
-     * Initialize parameters motors message. This Constructor is used for
+     * Initialize parameters unicycle message. This Constructor is used for
      * require data from board.
      */
-    public ParamMotors() {
+    public ParamUnicycle() {
         super();
         this.in = new byte[LNG_PARAM_MOTOR];
     }
@@ -87,14 +69,11 @@ public class ParamMotors extends MotionFrame {
      * @param command type command received.
      * @param in byte received.
      */
-    public ParamMotors(boolean sync, int command, byte[] in) {
+    public ParamUnicycle(boolean sync, int command, byte[] in) {
         super(sync, command, in);
         this.radius = AbstractFrame.byteArrayToFloatArray(in, 0, 2);
         this.wheelBase = AbstractFrame.byteArrayToFloat(in, 8);
-        this.kVel = AbstractFrame.byteArrayToFloatArray(in, 12, 2);
-        this.kAng = AbstractFrame.byteArrayToFloatArray(in, 20, 2);
-        this.spMin = AbstractFrame.byteArrayToFloat(in, 28);
-        this.pwmStep = AbstractFrame.byteArrayToInt(in, 32);
+        this.spMin = AbstractFrame.byteArrayToFloat(in, 12);
     }
 
     /**
@@ -105,13 +84,13 @@ public class ParamMotors extends MotionFrame {
      * @param command type command received.
      * @param info Information about message.
      */
-    public ParamMotors(boolean sync, int command, Information info) {
+    public ParamUnicycle(boolean sync, int command, Information info) {
         super(sync, command, info);
     }
 
     @Override
     public Command getCommand() {
-        return Command.PARAM_MOTORS;
+        return Command.PARAM_UNICYCLE;
     }
 
     /**
@@ -121,29 +100,7 @@ public class ParamMotors extends MotionFrame {
     protected void buildData() {
         this.in = AbstractFrame.floatArrayToByteArray(in, 0, this.radius);
         this.in = AbstractFrame.floatToByteArray(in, 8, this.wheelBase);
-        this.in = AbstractFrame.floatArrayToByteArray(in, 12, this.kVel);
-        this.in = AbstractFrame.floatArrayToByteArray(in, 20, this.kAng);
-        this.in = AbstractFrame.floatToByteArray(in, 28, this.spMin);
-        this.in = AbstractFrame.intToByteArray(in, 32, this.pwmStep);
-    }
-
-    /**
-     * Get the value of pwmStep
-     *
-     * @return the value of pwmStep
-     */
-    public int getPwmStep() {
-        return pwmStep;
-    }
-
-    /**
-     * Set the value of pwmStep
-     *
-     * @param pwmStep new value of pwmStep
-     */
-    public void setPwmStep(int pwmStep) {
-        this.pwmStep = pwmStep;
-        buildData();
+        this.in = AbstractFrame.floatToByteArray(in, 12, this.spMin);
     }
 
     /**
@@ -181,86 +138,6 @@ public class ParamMotors extends MotionFrame {
      */
     public void setWheelBase(float wheelBase) {
         this.wheelBase = wheelBase;
-        buildData();
-    }
-
-    /**
-     * Get the value of kAng
-     *
-     * @return the value of kAng
-     */
-    public float[] getkAng() {
-        return kAng;
-    }
-
-    /**
-     * Set the value of kAng
-     *
-     * @param kAng new value of kAng
-     */
-    public void setkAng(float[] kAng) {
-        this.kAng = kAng;
-        buildData();
-    }
-
-    /**
-     * Get the value of kAng at specified index
-     *
-     * @param index the index of kAng
-     * @return the value of kAng at specified index
-     */
-    public float getkAng(int index) {
-        return this.kAng[index];
-    }
-
-    /**
-     * Set the value of kAng at specified index.
-     *
-     * @param index the index of kAng
-     * @param kAng new value of kAng at specified index
-     */
-    public void setkAng(int index, float kAng) {
-        this.kAng[index] = kAng;
-        buildData();
-    }
-
-    /**
-     * Get the value of kVel
-     *
-     * @return the value of kVel
-     */
-    public float[] getkVel() {
-        return kVel;
-    }
-
-    /**
-     * Set the value of kVel
-     *
-     * @param kVel new value of kVel
-     */
-    public void setkVel(float[] kVel) {
-        this.kVel = kVel;
-        buildData();
-    }
-
-    /**
-     * Get the value of kVel at specified index
-     *
-     * @param index the index of kVel
-     * @return the value of kVel at specified index
-     */
-    public float getkVel(int index) {
-        return this.kVel[index];
-    }
-
-    /**
-     * Set the value of kVel at specified index.
-     *
-     * @param index the index of kVel
-     * @param kVel new value of kVel at specified index
-     */
-    public void setkVel(int index, float kVel) {
-        this.kVel[index] = kVel;
         buildData();
     }
 
