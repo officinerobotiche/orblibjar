@@ -38,8 +38,6 @@ public abstract class MotionFrame extends AbstractFrame {
 
         /**
          * PID Left command.
-         *//**
-         * PID Left command.
          */
         PID_L(0, "PID"),
         /**
