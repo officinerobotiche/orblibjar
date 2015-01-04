@@ -281,6 +281,29 @@ public abstract class AbstractFrame implements Jmessage {
     }
 
     /**
+     * Convert from byte array in boolean variable.
+     *
+     * @param b byte array.
+     * @param offset offset.
+     * @return boolean value associated.
+     */
+    public static boolean byteArrayToBoolean(byte[] b, int offset) {
+        return (byteArrayToInt8(b, offset) == 1);
+    }
+    
+    /**
+     * Convert from byte array in boolean variable.
+     *
+     * @param b byte array.
+     * @param offset offset.
+     * @return integer value associated.
+     */
+    public static int byteArrayToInt8(byte[] b, int offset) {
+        ByteBuffer buf = ByteBuffer.wrap(b, offset, 1).order(ByteOrder.LITTLE_ENDIAN);
+        return buf.getInt();
+    }
+
+    /**
      * Convert from byte array in float variable.
      *
      * @param b byte array.
@@ -308,6 +331,35 @@ public abstract class AbstractFrame implements Jmessage {
         return val;
     }
 
+    /**
+     * Convert boolean value and ad in array.
+     *
+     * @param in array to add converted integer value.
+     * @param offset offset to put the variable.
+     * @param value integer variable.
+     * @return the same byte array variable in with boolean value converted.
+     */
+    public static byte[] booleanToByteArray(byte[] in, int offset, boolean value) {
+        byte conv = (byte) (value ? 1 : 0 );
+        byte[] array = ByteBuffer.allocate(1).put((byte) conv).array();
+        System.arraycopy(array, 0, in, offset, array.length);
+        return in;
+    }
+
+        /**
+     * Convert boolean value and ad in array.
+     *
+     * @param in array to add converted integer value.
+     * @param offset offset to put the variable.
+     * @param value integer variable.
+     * @return the same byte array variable in with boolean value converted.
+     */
+    public static byte[] int8ToByteArray(byte[] in, int offset, int value) {
+        byte[] array = ByteBuffer.allocate(1).put((byte) value).array();
+        System.arraycopy(array, 0, in, offset, array.length);
+        return in;
+    }
+    
     /**
      * Convert integer value and ad in array.
      *

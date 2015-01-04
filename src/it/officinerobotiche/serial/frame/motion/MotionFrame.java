@@ -59,31 +59,39 @@ public abstract class MotionFrame extends AbstractFrame {
         /**
          * Parameter motors command.
          */
-        PARAM_MOTORS(5, "ParamMotors"),
+        PARAM_UNICYCLE(5, "ParamUnicycle"),
+        /**
+         * Parameter motors command.
+         */
+        PARAM_MOTOR_L(6, "ParamMotor"),
+        /**
+         * Parameter motors command.
+         */
+        PARAM_MOTOR_R(7, "ParamMotor"),
         /**
          * Contraint command.
          */
-        CONSTRAINT(6, "Constraint"),
+        CONSTRAINT(8, "Constraint"),
         /**
          * Velocity reference command.
          */
-        VELOCITY(7, "Velocity"),
+        VELOCITY(9, "Velocity"),
         /**
          * Velocity measured command.
          */
-        VELOCITY_MIS(8, "Velocity"),
+        VELOCITY_MIS(10, "Velocity"),
         /**
          * Enable bridge command.
          */
-        ENABLE(9, "Enable"),
+        ENABLE(11, "Enable"),
         /**
          * Emergency configuration command.
          */
-        EMERGENCY(10, "Emergency"),
+        EMERGENCY(12, "Emergency"),
         /**
          * Relative odometry command.
          */
-        DELTA_ODO(11, "DeltaOdo");
+        DELTA_ODO(13, "DeltaOdo");
 
         /**
          * Number command.
