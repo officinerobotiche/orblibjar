@@ -60,14 +60,14 @@ public class ParamMotor extends MotionFrame {
          *
          * @param kAng Gain to convert QEI value to angular position.
          * @param kVel Gain to convert Input Capture value to angular velocity motor.
-         * @param encoderSwap Set to swap encoder velocity measure.
+         * @param versus Set default orientation versus motor.
          * @param enable Set default level configuration h-bridge enable.
          */
-        public ParamMotorLeft(float kAng, float kVel, boolean encoderSwap, boolean enable) {
+        public ParamMotorLeft(float kAng, float kVel, int versus, boolean enable) {
             super(Command.PARAM_MOTOR_L);
             this.kAng = kAng;
             this.kVel = kVel;
-            this.encoderSwap = encoderSwap;
+            this.versus = versus;
             this.enable = enable;
             buildData();
         }
@@ -94,14 +94,14 @@ public class ParamMotor extends MotionFrame {
          *
          * @param kAng Gain to convert QEI value to angular position.
          * @param kVel Gain to convert Input Capture value to angular velocity motor.
-         * @param encoderSwap Set to swap encoder velocity measure.
+         * @param versus Set default orientation versus motor.
          * @param enable Set default level configuration h-bridge enable.
          */
-        public ParamMotorRight(float kAng, float kVel, boolean encoderSwap, boolean enable) {
+        public ParamMotorRight(float kAng, float kVel, int versus, boolean enable) {
             super(Command.PARAM_MOTOR_R);
             this.kAng = kAng;
             this.kVel = kVel;
-            this.encoderSwap = encoderSwap;
+            this.versus = versus;
             this.enable = enable;
             buildData();
         }
@@ -136,7 +136,7 @@ public class ParamMotor extends MotionFrame {
     /**
      * Set encoder velocity read to swap configuration.
      */
-    protected boolean encoderSwap;
+    protected int versus;
 
     /**
      * Initialize parameter motors message. This Constructor is used for require
@@ -163,7 +163,7 @@ public class ParamMotor extends MotionFrame {
         this.comm = Command.getCommand(command);
         this.kAng = AbstractFrame.byteArrayToFloat(in, 0);
         this.kVel = AbstractFrame.byteArrayToFloat(in, 4);
-        this.encoderSwap = AbstractFrame.byteArrayToBoolean(in, 8);
+        this.versus = AbstractFrame.byteArrayToInt8(in, 8);
         this.enable = AbstractFrame.byteArrayToBoolean(in, 9);
     }
 
@@ -192,26 +192,26 @@ public class ParamMotor extends MotionFrame {
     protected void buildData() {
         this.in = AbstractFrame.floatToByteArray(in, 0, kAng);
         this.in = AbstractFrame.floatToByteArray(in, 4, kVel);
-        this.in = AbstractFrame.booleanToByteArray(in, 8, encoderSwap);
+        this.in = AbstractFrame.int8ToByteArray(in, 8, versus);
         this.in = AbstractFrame.booleanToByteArray(in, 9, enable);
     }
 
     /**
-     * Get the value of encoderSwap
+     * Get the value of versus
      *
-     * @return the value of encoderSwap
+     * @return the value of versus
      */
-    public boolean isEncoderSwap() {
-        return encoderSwap;
+    public int getVersus() {
+        return versus;
     }
 
     /**
-     * Set the value of encoderSwap
+     * Set the value of versus
      *
-     * @param encoderSwap new value of encoderSwap
+     * @param versus new value of versus
      */
-    public void setEncoderSwap(boolean encoderSwap) {
-        this.encoderSwap = encoderSwap;
+    public void setVersus(int versus) {
+        this.versus = versus;
         buildData();
     }
 
